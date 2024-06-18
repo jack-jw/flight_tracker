@@ -7,15 +7,25 @@ Dot paths should be relative to the working directory
 
 from platform import system
 from os import mkdir
-from os.path import abspath, expanduser, exists, join
+from os.path import expanduser, exists, join
+
+_USER = expanduser("~")
 
 if system() == "Darwin":
-    _LIBRARY = expanduser("~/Library")
-    INSTANCE = join(_LIBRARY, "Application Support/flight_tracker")
-    LOCAL = join(_LIBRARY, "Caches/flight_tracker")
+    INSTANCE = join(_USER, "Library/Application Support/flight_tracker")
+    LOCAL = join(_USER, "Library/Caches/flight_tracker")
+
+elif system() == "Linux":
+    # need to test this
+    for folder in (join(_USER, ".local"), join(_USER, ".local/share"), join(_USER, ".cache")):
+        if not exists(folder):
+            mkdir(folder)
+
+    INSTANCE = join(_USER, ".local/share/flight_tracker")
+    LOCAL = join(_USER, ".cache/flight_tracker")
+
 else:
-    INSTANCE = abspath("../instance")
-    LOCAL = join(INSTANCE, "local")
+    raise OSError("flight_tracker only runs on macOS and Linux.") # for now
 
 INSTANCE_IMAGES = join(INSTANCE, "images")
 LOCAL_IMAGES = join(LOCAL, "images")

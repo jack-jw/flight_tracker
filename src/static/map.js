@@ -137,7 +137,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('main-container-main-view').style.display = null;
         document.getElementById('main-container-aircraft-view').style.display = "none";
-        document.getElementById('main-container-aircraft-view').innerHTML = null;
         selection = info = polylines = null;
         setMaxContainerHeight();
     }
@@ -388,6 +387,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.on('lookup.all', function(response) {
         info = response;
+        console.log(info)
 
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
@@ -436,111 +436,66 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('main-container-main-view').style.display = 'none';
         aircraftView = document.getElementById('main-container-aircraft-view');
-        aircraftView.style.display = null;
 
-        // really messy - find alternative
-        aircraftView.innerHTML = `
-            <div id="back">&larr;</div>
-            <div id="info">i</div>
-            <div class="aircraft-img-shadow"><img class="aircraft-img" src="/image/${info.aircraft.reg}"></div>
-            <div class="aircraft-info">
+        document.getElementById('aircraft-img').src = '/image/aircraft/' + info.aircraft.reg;
+        document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
+        document.getElementById('aircraft-airline-name').textContent = info.airline.name
+        document.getElementById('aircraft-callsign').textContent = info.callsign
+        document.getElementById('aircraft-callsign').title = info.radioCallsign
+        document.getElementById('aircraft-route-origin').textContent = info.origin.muni
+        document.getElementById('aircraft-route-destination').textContent = info.destination.muni
 
-                <div style="position: relative; top: 0; padding-bottom: 25px; padding-top: 15px">
-                    <div style="position: absolute; margin-left: 5px; background-image: url(https://www.flightaware.com/images/airline_logos/180px/${info.callsign.slice(0,3)}.png); background-size: contain; background-position: center; background-repeat: no-repeat; height: 2ch; aspect-ratio: 1;"></div>
-                    <span style="position: absolute; margin-left: 3ch">${info.airline.name}</span>
-                    <span style="position: absolute; right: 0; cursor: help" title="${info.radioCallsign}"> ${info.callsign}</span>
-                </div>
-                <hr>
-                <div style="position: relative; color: grey; padding: 10px 0">
-                    <span id="origin-${info.callsign}" style="position: absolute; left: 0">${info.origin.muni}</span>
+        document.getElementById('origin-input').placeholder = info.origin.iata
+        document.getElementById('destination-input').placeholder = info.destination.iata
+        
+        document.getElementById('aircraft-reg').textContent = info.aircraft.reg
+        document.getElementById('aircraft-reg-flag').classList.add('fi-' + info.aircraft.country.toLowerCase())
 
-                    <span id="destination-${info.callsign}" style="position: absolute; right: 0">${info.destination.muni}</span>
-                </div>
-
-                <div style="position: relative; margin: 0; padding-bottom: 50px;">
-                    <input id="origin-input" class="iata-input" style="position: absolute; left: 0" placeholder="${info.origin.iata}" contenteditable="true" required maxlength="3" minlength="3">
-
-                    <input id="destination-input" class="iata-input" style="text-align: right; position: absolute; right: 0" placeholder="${info.destination.iata}" contenteditable="true" required maxlength="3" minlength="3">
-
-                    <h1 style="position: absolute; left: 50%; transform: translateX(-50%)">&#x2708;</h1>
-                </div>
-                <progress id="flight-progress" value="0"></progress>
-
-                <div style="position: relative; padding: 10px 0">
-                    <span style="position: absolute; left: 0"><span class="fi fis fi-${info.aircraft.country.toLowerCase()}"></span> ${info.aircraft.reg}</span>
-
-                    <span style="position: absolute; right: 0">${info.aircraft.type}</span>
-                </div>
-
-
-                <div style="position: relative; padding: 30px 0">
-                    <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 2; border-radius: 10px">
-                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 1;">
-                            <svg width="100%" height="100%" viewBox="0 7.5 100 100" class="metre">
-                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)" stroke-width="10"/>
-
-                                <text x="50%" y="70%" text-anchor="middle" class="metre-value">${selection.speed}</text>
-                                <text x="50%" y="90%" text-anchor="middle" class="metre-unit">KTS</text>
-
-                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="dodgerblue" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="speed-indicator"/>
-                            </svg>
-                        </div>
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
-                    </div>
-
-                    <div style="position: absolute; right: 0; width: calc(50% - 7.5px); aspect-ratio: 2; border-radius: 10px">
-                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
-                    </div>
-                </div>
-
-            </div>`;
-
-        plotRoutes();
-        centreOnSelection();
-
+        document.getElementById('aircraft-speed').textContent = selection.speed
         const speedBounded = Math.max(0, Math.min((selection.speed/600), 1));
         const dashoffset = 188.4 - (speedBounded * 188.4);
-        document.getElementById('speed-indicator').style.strokeDashoffset = dashoffset;
+        document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = dashoffset;
 
         document.getElementById("origin-input").addEventListener("input", function() {
-            if (this.value.length >= parseInt(this.getAttribute("maxlength"))) {
-                socket.emit("lookup.airport", this.value, `origin-${info.callsign}`);
+            if (this.value.length == 3) {
+                socket.emit("lookup.airport", this.value, 'origin');
                 document.getElementById('destination-input').focus()
             } else {
-                document.getElementById(`origin-${info.callsign}`).innerHTML = 'Origin';
+                document.getElementById('aircraft-route-origin').innerHTML = 'Origin';
             }
         });
 
         document.getElementById("destination-input").addEventListener("input", function() {
-            if (this.value.length >= parseInt(this.getAttribute("maxlength"))) {
-                socket.emit("lookup.airport", this.value, `destination-${info.callsign}`);
+            if (this.value.length == 3) {
+                socket.emit("lookup.airport", this.value, 'destination');
                 document.getElementById('destination-input').blur()
             } else {
-                document.getElementById(`destination-${info.callsign}`).innerHTML = 'Destination';
+                document.getElementById('aircraft-route-destination').innerHTML = 'Destination';
             }
         });
+
+        plotRoutes();
+        centreOnSelection();
 
         container.style.borderRadius = null;
         setMaxContainerHeight()
         document.getElementById('back').addEventListener('click', clearMap);
+        aircraftView.style.display = null;
     });
 
     socket.on('lookup.airport', function(airport) {
         if (airport.routing !== null) {
-            if (typeof airport.muni !== 'undefined') {
-                document.getElementById(airport.routing).innerHTML = airport.muni;
-            }
-
-            if (airport.routing.startsWith('origin-')) {
+            if (airport.routing == 'origin') {
                 if (selection.icao24 === polylines.icao24) {
                     info.origin = airport;
                 }
+                document.getElementById('aircraft-route-origin').textContent = airport.muni
                 socket.emit("lookup.add_origin", selection.callsign, airport.icao);
-            } else if (airport.routing.startsWith('destination-')) {
+            } else if (airport.routing == 'destination') {
                 if (selection.icao24 === polylines.icao24) {
                     info.destination = airport;
                 }
+                document.getElementById('aircraft-route-destination').textContent = airport.muni
                 socket.emit("lookup.add_destination", selection.callsign, airport.icao);
             }
         }

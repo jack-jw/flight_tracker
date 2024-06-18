@@ -21,7 +21,7 @@
 
     <div id="main-container">
         <div id="main-container-main-view">
-            <div class="resize-handle"></div>
+            <div id="resize-handle"></div>
             <h1>Aircraft</h1>
             <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
             <div id="aircraft-list" style="clear: left;"></div>
@@ -42,13 +42,13 @@
             <div id="aircraft-info">
                 <div id="aircraft-airline-callsign">
                     <div id="aircraft-airline-logo" class="airline-logo"></div>
-                    <span id="aircraft-airline-name"></span>
-                    <span id="aircraft-callsign"></span>
+                    <div id="aircraft-airline-name"></div>
+                    <div id="aircraft-callsign"></div>
                 </div>
                 <hr>
                 <div style="position: relative; padding: 10px 0">
-                    <span id="aircraft-route-origin"></span>
-                    <span id="aircraft-route-destination"></span>
+                    <div id="aircraft-route-origin"></div>
+                    <div id="aircraft-route-destination"></div>
                 </div>
 
                 <div style="position: relative; margin: 0; padding-bottom: 50px;">
@@ -62,9 +62,9 @@
                 <progress id="flight-progress" value="0"></progress>
 
                 <div style="position: relative; padding: 10px 0">
-                    <span style="position: absolute; left: 0"><span class="fi fis"></span><span id="aircraft-reg"></span></span>
+                    <div style="position: absolute; left: 0"><span id="aircraft-reg-flag" class="fi fis"></span> <span id="aircraft-reg"></span></div>
 
-                    <span id="aircraft-type" style="position: absolute; right: 0"></span>
+                    <div id="aircraft-type" style="position: absolute; right: 0"></div>
                 </div>
 
                 <div style="position: relative; padding: 30px 0">
@@ -74,7 +74,7 @@
                             <svg width="100%" height="100%" viewBox="0 7.5 100 100" class="metre">
                                 <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)" stroke-width="10"/>
 
-                                <text id="aircraft-speed" x="50%" y="70%" text-anchor="middle" class="metre-value"></text>
+                                <text id="aircraft-speed" x="50%" y="70%" text-anchor="middle" class="aircraft-speed-value"></text>
                                 <text x="50%" y="90%" text-anchor="middle" class="metre-unit">KTS</text>
 
                                 <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="dodgerblue" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="aircraft-speed-indicator"/>

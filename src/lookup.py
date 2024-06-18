@@ -165,7 +165,7 @@ def check():
     for table in ("airlines", "aircraft", "airports", "prefixes"):
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
         if cursor.fetchone() is None:
-            print(f"Updating {table} table")
+            print(f"Creating {table} table")
             update(table)
     cursor.close()
     main_db.close()

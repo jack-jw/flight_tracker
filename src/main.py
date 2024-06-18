@@ -32,15 +32,15 @@ def start():
     def index():
         return render_template("map.html", initial="★", colour="dodgerblue")
 
-    @app.route("/image/<tail>")
+    @app.route("/image/aircraft/<tail>")
     def serve_image(tail):
         placeholder = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAA"
                                 "AAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
         if tail == "Unknown Reg":
             return placeholder, 200, {"Content-Type": "image/png"}
 
-        if exists(f"{INSTANCE_IMAGES}/{tail}.jpeg"):
-            with open(f"{INSTANCE_IMAGES}/{tail}.jpeg", "rb") as f:
+        if exists(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg"):
+            with open(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg", "rb") as f:
                 image_content = f.read()
             return image_content, 200, {"Content-Type": "image/jpeg"}
 

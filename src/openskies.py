@@ -83,6 +83,7 @@ def load(filename, gb_only=False, num_only=False):
 
         # add to the result
         if all(dictionary[key] for key in ["lat", "lng", "hdg", "alt", "callsign"]) and numerical_callsign:
+            dictionary["callsign"] = dictionary["callsign"].strip()
             if iterator == 500:
                 break
             else:
