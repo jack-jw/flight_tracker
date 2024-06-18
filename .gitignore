@@ -1,0 +1,5 @@
+.DS_Store
+instance/
+__pycache__
+os.json
+*.xcodeproj/
