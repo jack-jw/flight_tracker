@@ -19,7 +19,7 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * ~~Add airline logos from FlightAware~~
         * Reorganise (airline logos too big?)
         * Optimise and fix buggy scrolling on mobile
-    * Aircraft detail page
+    * Flight detail view
         * Fix horrendous implementation in JS
         * ~~Callsign~~
             * ~~Radio callsign in tooltip~~
