@@ -14,9 +14,7 @@ Functions:
 from os.path import exists
 from requests import get
 from bs4 import BeautifulSoup
-from paths import INSTANCE
-
-_JP_LOCATION = f"{INSTANCE}/local/jetphotos"
+from paths import LOCAL_IMAGES
 
 def full_url(reg):
     """
@@ -75,7 +73,7 @@ def full(reg):
     Returns a URL as a string (or None if not found)
     """
 
-    image = f"{_JP_LOCATION}/full-{reg}.jpeg"
+    image = f"{LOCAL_IMAGES}/jp-full-{reg}.jpeg"
     if exists(image):
         return image
 
@@ -99,7 +97,7 @@ def thumb(reg):
     Returns a URL to JetPhotos as a string (or None if not found)
     """
 
-    image = f"{_JP_LOCATION}/thumb-{reg}.jpeg"
+    image = f"{LOCAL_IMAGES}/jp-thumb-{reg}.jpeg"
     if exists(image):
         return image
 

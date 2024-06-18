@@ -184,6 +184,48 @@ body {
     border-bottom: 0.1px solid var(--control-colour);
 }
 
+#aircraft-airline-callsign {
+    position: relative;
+    top: 0;
+    padding-bottom: 25px;
+    padding-top: 15px;
+}
+
+#aircraft-airline-callsign .airline-logo {
+    position: absolute;
+    margin-left: 5px;
+    background-image:
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 2ch;
+    aspect-ratio: 1;
+}
+
+#aircraft-airline-name {
+    position: absolute;
+    margin-left: 3ch
+}
+
+#aircraft-callsign {
+    position: absolute;
+    right: 0;
+    cursor: help
+}
+
+#aircraft-route-origin, #aircraft-route-destination {
+    position: absolute
+    color: grey;
+}
+
+#aircraft-route-origin {
+    left: 0
+}
+
+#aircraft-route-destination {
+    right: 0
+}
+
 #back, #info {
     width: 28px;
     height: 28px;
@@ -248,6 +290,7 @@ h1, .iata-input {
 }
 
 .iata-input, .iata-input:focus {
+    position: absolute;
     width: 100px;
     background-color: var(--hover-colour);
     border-radius: 5px;

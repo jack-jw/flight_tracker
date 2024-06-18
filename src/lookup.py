@@ -22,9 +22,9 @@ import sqlite3
 from csv import reader
 import requests
 from bs4 import BeautifulSoup
-from paths import INSTANCE
+from paths import INSTANCE, LOCAL
 
-_DATABASE = f"{INSTANCE}/local/local.db"
+_DATABASE = f"{LOCAL}/local.db"
 _INSTANCE_DATABASE = f"{INSTANCE}/instance.db"
 
 _AIRCRAFT_URL = "https://opensky-network.org/datasets/metadata/aircraftDatabase.csv"
@@ -165,6 +165,7 @@ def check():
     for table in ("airlines", "aircraft", "airports", "prefixes"):
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
         if cursor.fetchone() is None:
+            print(f"Updating {table} table")
             update(table)
     cursor.close()
     main_db.close()

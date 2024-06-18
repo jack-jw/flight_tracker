@@ -14,7 +14,7 @@ from threading import Thread
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
-from paths import INSTANCE
+from paths import INSTANCE, INSTANCE_IMAGES
 import lookup
 import jetphotos
 import openskies
@@ -39,8 +39,8 @@ def start():
         if tail == "Unknown Reg":
             return placeholder, 200, {"Content-Type": "image/png"}
 
-        if exists(f"{INSTANCE}/images/{tail}.jpeg"):
-            with open(f"{INSTANCE}/images/{tail}.jpeg", "rb") as f:
+        if exists(f"{INSTANCE_IMAGES}/{tail}.jpeg"):
+            with open(f"{INSTANCE_IMAGES}/{tail}.jpeg", "rb") as f:
                 image_content = f.read()
             return image_content, 200, {"Content-Type": "image/jpeg"}
 
