@@ -151,6 +151,37 @@ def _get_row(table, search_column, query):
 
     return result
 
+def _get_country_from_reg(reg):
+    """
+    Internal, use aircraft() function
+
+    Look up the country an aircraft's reg prefix corresponds to
+    Takes the aircraft's registration number as a string
+    Returns a country code as a string
+    """
+
+    if not reg:
+        return None
+
+    main_db = sqlite3.connect(_DATABASE)
+    cursor = main_db.cursor()
+
+    while True:
+        try:
+            cursor.execute("SELECT country FROM prefixes WHERE ? LIKE prefix || '%'", (reg,))
+            break
+        except sqlite3.OperationalError:
+            update("prefixes")
+
+    result = cursor.fetchone()
+    cursor.close()
+    main_db.close()
+    if result:
+        result = result[0]
+    else:
+        result = "XX"
+    return result
+
 # MARK: - Main functions
 
 # MARK: Database management
@@ -384,9 +415,14 @@ def aircraft(address):
     address = address.lower()
     result = _get_row("aircraft", "icao24",address)
     if result:
+        if "reg" in result:
+            result["country"] = _get_country_from_reg(result["reg"])
+        else:
+            result["country"] = "XX"
+
         return result
 
-    return {"icao24": address}
+    return {"icao24": address, "country": "XX"}
 
 def airport(code):
     """
@@ -407,35 +443,6 @@ def airport(code):
         return _get_row("airports", "icao",code)
 
     return None
-
-def prefix(reg):
-    """
-    Look up the country an aircraft's reg prefix corresponds to
-    Takes the aircraft's registration number as a string
-    Returns a country code as a string
-    """
-
-    if not reg:
-        return None
-
-    main_db = sqlite3.connect(_DATABASE)
-    cursor = main_db.cursor()
-
-    while True:
-        try:
-            cursor.execute("SELECT country FROM prefixes WHERE ? LIKE prefix || '%'", (reg,))
-            break
-        except sqlite3.OperationalError:
-            update("prefixes")
-
-    result = cursor.fetchone()
-    cursor.close()
-    main_db.close()
-    if result:
-        result = result[0]
-    else:
-        result = "XX"
-    return result
 
 def route(callsign):
     """

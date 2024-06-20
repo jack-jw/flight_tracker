@@ -76,11 +76,6 @@ def start():
         info["airline"] = lookup.airline(callsign)
         info["aircraft"] = lookup.aircraft(aircraft_address)
 
-        if "reg" in info["aircraft"]:
-            info["aircraft"]["country"] = lookup.prefix(info["aircraft"]["reg"])
-        else:
-            info["aircraft"]["country"] = "XX"
-
         info["callsign"] = callsign
 
         if "name" not in info["airline"]:

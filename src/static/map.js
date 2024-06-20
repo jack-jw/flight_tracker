@@ -439,19 +439,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('aircraft-img').src = '/image/aircraft/' + info.aircraft.reg;
         document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
-        document.getElementById('aircraft-airline-name').textContent = info.airline.name
-        document.getElementById('aircraft-callsign').textContent = info.callsign
-        document.getElementById('aircraft-callsign').title = info.radioCallsign
-        document.getElementById('aircraft-route-origin').textContent = info.origin.muni
-        document.getElementById('aircraft-route-destination').textContent = info.destination.muni
+        document.getElementById('aircraft-airline-name').textContent = info.airline.name;
+        document.getElementById('aircraft-callsign').textContent = info.callsign;
+        document.getElementById('aircraft-callsign').title = info.radioCallsign;
+        document.getElementById('aircraft-route-origin').textContent = info.origin.muni;
+        document.getElementById('aircraft-route-destination').textContent = info.destination.muni;
 
-        document.getElementById('origin-input').placeholder = info.origin.iata
-        document.getElementById('destination-input').placeholder = info.destination.iata
-        
-        document.getElementById('aircraft-reg').textContent = info.aircraft.reg
-        document.getElementById('aircraft-reg-flag').classList.add('fi-' + info.aircraft.country.toLowerCase())
+        document.getElementById('origin-input').placeholder = info.origin.iata;
+        document.getElementById('origin-input').value = null;
+        document.getElementById('destination-input').placeholder = info.destination.iata;
+        document.getElementById('destination-input').value = null;
 
-        document.getElementById('aircraft-speed').textContent = selection.speed
+        document.getElementById('flight-progress').value = null;
+
+        document.getElementById('aircraft-reg').textContent = info.aircraft.reg;
+        document.getElementById('aircraft-reg-flag').className = 'fi fis fi-' + info.aircraft.country.toLowerCase();
+        document.getElementById('aircraft-type').textContent = info.aircraft.type;
+
+        document.getElementById('aircraft-speed').textContent = selection.speed;
         const speedBounded = Math.max(0, Math.min((selection.speed/600), 1));
         const dashoffset = 188.4 - (speedBounded * 188.4);
         document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = dashoffset;
@@ -459,7 +464,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("origin-input").addEventListener("input", function() {
             if (this.value.length == 3) {
                 socket.emit("lookup.airport", this.value, 'origin');
-                document.getElementById('destination-input').focus()
+                document.getElementById('destination-input').focus();
             } else {
                 document.getElementById('aircraft-route-origin').innerHTML = 'Origin';
             }

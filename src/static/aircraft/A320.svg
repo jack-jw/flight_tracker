@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 124 117">
+  <defs>
+    <style>
+      .cls-1 {
+        filter: url(#drop-shadow-2);
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #fff;
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        filter: url(#drop-shadow-1);
+      }
+
+      .cls-3 {
+        filter: url(#drop-shadow-3);
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-2" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-3" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-3" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-3" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g id="A320">
+      <path class="cls-2" d="M40.36,71.82s4.58-1.73,10.8,0v4.87c-6.21,1.73-10.8,0-10.8,0v-4.87Z"/>
+      <path class="cls-1" d="M40.36,44.6s4.58,1.73,10.8,0v-4.87c-6.21-1.73-10.8,0-10.8,0v4.87Z"/>
+      <path class="cls-3" d="M108.89,56.1l3.33-14.72c.11-.48-.25-.93-.74-.93h-1.87c-.67,0-1.29.34-1.65.91l-7.52,11.96c-.46.73-1.32,1.11-2.17.95-2.91-.54-9.59-1.71-12.84-1.71h-23.42v-8.4c0-2.47.33-4.92.99-7.3l7.05-25.6c.64-2.31-2.6-3.56-3.68-1.43l-20.41,40.12c-.82,1.6-2.46,2.61-4.26,2.61h-17.09c-9.02,0-13.53,2.67-15.47,4.34-.8.69-.8,1.93,0,2.62,1.94,1.67,6.45,4.34,15.47,4.34h17.09c1.8,0,3.45,1.01,4.26,2.61l20.41,40.12c1.09,2.13,4.32.88,3.68-1.43l-7.05-25.6c-.66-2.38-.99-4.84-.99-7.3v-8.4h23.42c3.25,0,9.93-1.17,12.84-1.71.85-.16,1.71.22,2.17.95l7.52,11.96c.36.57.98.91,1.65.91h1.87c.49,0,.85-.45.74-.93l-3.33-14.72s3.28-.2,5.97-1.56v-1.1c-2.69-1.36-5.97-1.56-5.97-1.56Z"/>
+    </g>
+  </g>
+</svg>

@@ -58,12 +58,11 @@ def load(filename, gb_only=False, num_only=False):
 
         if num_only:
             try:
-                int(dictionary["callsign"][3:])
+                flight_number = int(dictionary["callsign"][3:])
                 numerical_callsign = True
+                dictionary["callsign"] = dictionary["callsign"][:3] + str(flight_number)
             except ValueError:
                 numerical_callsign = False
-        else:
-            numerical_callsign = True # not the best implementation
 
         # delete unnecessary keys to save bandwidth
         for delete in ("origin_country",
@@ -82,7 +81,7 @@ def load(filename, gb_only=False, num_only=False):
                 pass
 
         # add to the result
-        if all(dictionary[key] for key in ["lat", "lng", "hdg", "alt", "callsign"]) and numerical_callsign:
+        if all(dictionary[key] for key in ["lat", "lng", "hdg", "alt", "callsign"]) and (num_only and numerical_callsign):
             dictionary["callsign"] = dictionary["callsign"].strip()
             if iterator == 500:
                 break

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 96 94">
+  <defs>
+    <style>
+      .cls-1 {
+        filter: url(#drop-shadow-2);
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #fff;
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        filter: url(#drop-shadow-1);
+      }
+
+      .cls-3 {
+        filter: url(#drop-shadow-3);
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-2" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-3" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-3" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-3" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g id="AT72">
+      <g>
+        <path class="cls-2" d="M33.78,58.85c.64.37,2.39.9,7.22.9v-2.47c-4.83,0-6.59.54-7.22.9-.26.15-.26.51,0,.66Z"/>
+        <path class="cls-1" d="M33.78,34.87c.64-.37,2.39-.9,7.22-.9v2.47c-4.83,0-6.59-.54-7.22-.9-.26-.15-.26-.51,0-.66Z"/>
+      </g>
+      <path class="cls-3" d="M87.14,46.87c0-.17-.84-.24-1.24-.26-.12,0-.2-.1-.21-.21l-.52-9.01c-.02-.4-.36-.72-.76-.72h-1.26c-.61,0-1.14.43-1.26,1.03l-1.53,7.45c-.05.24-.28.4-.52.35-2.29-.47-13.16-2.67-17.48-2.67h-13.38c-.44,0-.81-.36-.81-.81v-7.41c0-.66-.02-1.32-.05-1.99l-1.24-22.48c-.03-.63-.55-1.12-1.18-1.12h-1.29c-.94,0-1.72.72-1.79,1.66l-1.69,21.53c-.07.93-.11,1.87-.11,2.81v7c0,.44-.36.81-.81.81h-23.05c-4.24,0-6.57,1.57-7.73,2.75-.7.72-.7,1.86,0,2.58,1.15,1.18,3.48,2.75,7.73,2.75h23.05c.44,0,.81.36.81.81v7c0,.94.04,1.87.11,2.81l1.69,21.53c.07.94.85,1.66,1.79,1.66h1.29c.63,0,1.15-.49,1.18-1.12l1.24-22.48c.04-.66.05-1.32.05-1.99v-7.41c0-.44.36-.81.81-.81h13.38c4.32,0,15.19-2.2,17.48-2.67.24-.05.47.11.52.35l1.53,7.45c.12.6.65,1.03,1.26,1.03h1.26c.41,0,.74-.32.76-.72l.52-8.99c0-.12.1-.21.21-.21.4-.02,1.24-.1,1.24-.26Z"/>
+    </g>
+  </g>
+</svg>

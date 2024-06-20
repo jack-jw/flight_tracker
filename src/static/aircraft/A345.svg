@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 211 209">
+  <defs>
+    <style>
+      .cls-1 {
+        filter: url(#drop-shadow-5);
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5 {
+        fill: #fff;
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        filter: url(#drop-shadow-2);
+      }
+
+      .cls-3 {
+        filter: url(#drop-shadow-1);
+      }
+
+      .cls-4 {
+        filter: url(#drop-shadow-3);
+      }
+
+      .cls-5 {
+        filter: url(#drop-shadow-4);
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-2" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-3" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-3" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-3" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-4" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-4" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-4" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-5" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-5" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur-5" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g id="A345">
+      <path class="cls-3" d="M90.38,77.35h-12.27c-1.05,0-1.9-.85-1.9-1.9v-3.8c0-1.05.85-1.9,1.9-1.9h14.46l-2.19,7.61Z"/>
+      <path class="cls-2" d="M111.4,44.04h-12.27c-1.05,0-1.9-.85-1.9-1.9v-3.8c0-1.05.85-1.9,1.9-1.9h14.46l-2.19,7.61Z"/>
+      <path class="cls-4" d="M90.38,131.26h-12.27c-1.05,0-1.9.85-1.9,1.9v3.8c0,1.05.85,1.9,1.9,1.9h14.46l-2.19-7.61Z"/>
+      <path class="cls-5" d="M111.4,164.57h-12.27c-1.05,0-1.9.85-1.9,1.9v3.8c0,1.05.85,1.9,1.9,1.9h14.46l-2.19-7.61Z"/>
+      <path class="cls-1" d="M193.05,107.2l6.1-1.84c1.05-.32,1.05-1.8,0-2.12l-6.1-1.84,8.53-27.32c.3-.97-.42-1.96-1.44-1.96h-2.65c-1.62,0-3.13.81-4.03,2.16l-15.37,23.15c-.54.81-1.52,1.22-2.47,1.04-5.04-.98-21.33-3.9-36.16-3.9h-30.21l2.44-15.97c.49-3.21,1.36-6.35,2.58-9.36l23.82-58.45c.43-1.06-.35-2.23-1.5-2.23h-3.95c-1.75,0-3.38.89-4.32,2.36l-52.6,81.99c-.66,1.03-1.81,1.66-3.04,1.66h-24.44c-28.14,0-36.24,5.31-38.56,8.09-.8.96-.8,2.35,0,3.3,2.31,2.78,10.41,8.09,38.56,8.09h24.44c1.23,0,2.37.63,3.04,1.66l52.6,81.99c.94,1.47,2.57,2.36,4.32,2.36h3.95c1.15,0,1.93-1.16,1.5-2.23l-23.82-58.45c-1.23-3.01-2.09-6.15-2.58-9.36l-2.44-15.97h30.21c14.83,0,31.11-2.92,36.16-3.9.96-.19,1.93.22,2.47,1.04l15.37,23.15c.9,1.35,2.41,2.16,4.03,2.16h2.65c1.02,0,1.75-.99,1.44-1.96l-8.53-27.32Z"/>
+    </g>
+  </g>
+</svg>

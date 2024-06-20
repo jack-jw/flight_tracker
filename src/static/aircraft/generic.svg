@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 132 127">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        filter: url(#drop-shadow-1);
+        stroke-width: 0px;
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="2.83"/>
+      <feFlood flood-color="#000" flood-opacity=".15"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <path class="cls-1" d="M103.87,52.61s-13.43,0-23.65,0c-1.01,0-1.97-.46-2.59-1.26L45.54,10.72c-2.83-3.58-8.5-.47-7,3.84l13.43,38.55c-11.42.57-22.8,1.48-29.9,2.11l-6.13-14.08c-1.53-3.52-6.79-2.43-6.79,1.41v42.27c0,3.84,5.26,4.94,6.79,1.41l6.13-14.09c7.13.62,18.55,1.54,29.9,2.11l-13.44,38.56c-1.5,4.31,4.17,7.43,7,3.84l32.09-40.63c.63-.79,1.58-1.26,2.59-1.26,10.23,0,23.65,0,23.65,0,0,0,18.66.02,18.66-11.09s-18.66-11.09-18.66-11.09Z"/>
+  </g>
+</svg>
