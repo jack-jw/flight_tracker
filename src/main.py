@@ -30,13 +30,13 @@ def start():
 
     @app.route("/")
     def index():
-        return render_template("map.html", initial="★", colour="dodgerblue")
+        return render_template("map.html", initial="★", colour="#3478F6")
 
     @app.route("/image/aircraft/<tail>")
     def serve_image(tail):
         placeholder = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAA"
                                 "AAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
-        if tail == "Unknown Reg":
+        if (tail == "Unknown Reg") or (tail == "placeholder"):
             return placeholder, 200, {"Content-Type": "image/png"}
 
         if exists(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg"):

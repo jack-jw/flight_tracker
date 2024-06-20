@@ -12,28 +12,39 @@
 
     <script src="{{ url_for('static', filename='map.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='plane.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='bg-icon.jpeg') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
     <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)">
+
+    <!-- theme coloured things -->
+    <style>
+        :root {
+            accent-color: {{ colour }};
+        }
+
+        #flight-progress::-webkit-progress-value {
+            background-color: {{ colour }};
+        }
+
+        #flight-progress::-moz-progress-bar {
+            background-color: {{ colour }};
+        }
+
+        #flight-progress::after {
+            background-color: {{ colour }};
+        }
+
+        .metre-progress {
+            stroke: {{ colour }};
+        }
+    </style>
 </head>
 <body>
     <div id="map"></div>
 
     <div id="main-container">
-        <div id="main-container-main-view">
-            <div id="resize-handle"></div>
-            <h1>Aircraft</h1>
-            <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
-            <div id="aircraft-list" style="clear: left;"></div>
-            <footer id="credits" style="opacity: 50%; text-align: center; margin-top: 25px; font-size: 12px;"</div>
-                Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet <span class="fi fis fi-ua"></span></a>
-                <br>
-                Map data © <a target="_blank" href="https://www.openstreetmap.org/copyright" id="map-data-credit">OpenStreetMap</a>
-                <br><br>
-                <a target="_blank" href="about:blank" id="map-data-credit">All acknowledgements &nearr;</a>
-            </footer>
-        </div>
-
         <div id="main-container-aircraft-view" style="display: none;">
             <div id="back">&larr;</div>
             <div id="info">i</div>
@@ -46,28 +57,28 @@
                     <div id="aircraft-callsign"></div>
                 </div>
                 <hr>
-                <div style="position: relative; padding: 10px 0">
+                <div style="position: relative; height: 2ch; padding: 7.5px 0 0">
                     <div id="aircraft-route-origin"></div>
                     <div id="aircraft-route-destination"></div>
                 </div>
 
-                <div style="position: relative; margin: 0; padding-bottom: 50px;">
+                <div id="iata-inputs-parent">
                     <input id="origin-input" class="iata-input" style="left: 0" contenteditable="true" maxlength="3" minlength="3" required>
 
                     <input id="destination-input" class="iata-input" style="text-align: right; right: 0" contenteditable="true" maxlength="3" minlength="3" required>
 
-                    <h1 style="position: absolute; left: 50%; transform: translateX(-50%)">&#x2708;</h1>
+                    <div id="iata-inputs-plane">&#x2708;</div>
                 </div>
 
                 <progress id="flight-progress" value="0"></progress>
 
-                <div style="position: relative; padding: 10px 0">
+                <div style="position: relative; height: 2ch; padding-top: 15px">
                     <div style="position: absolute; left: 0"><span id="aircraft-reg-flag"></span> <span id="aircraft-reg"></span></div>
 
                     <div id="aircraft-type" style="position: absolute; right: 0"></div>
                 </div>
 
-                <div style="position: relative; padding: 30px 0">
+                <div style="position: relative; width: 100%; aspect-ratio: 4; padding-top: 15px">
 
                     <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 2; border-radius: 10px">
                         <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 1;">
@@ -77,18 +88,32 @@
                                 <text id="aircraft-speed" x="50%" y="70%" text-anchor="middle" class="metre-value"></text>
                                 <text x="50%" y="90%" text-anchor="middle" class="metre-unit">KTS</text>
 
-                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="dodgerblue" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="aircraft-speed-indicator"/>
+                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="aircraft-speed-indicator"/>
                             </svg>
                         </div>
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
+                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px; box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);"></div>
                     </div>
 
                     <div style="position: absolute; right: 0; width: calc(50% - 7.5px); aspect-ratio: 2; border-radius: 10px">
-                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px"></div>
+                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px; box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);"></div>
+                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px; box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);"></div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div id="main-container-main-view">
+            <div id="resize-handle"></div>
+            <h1>Aircraft</h1>
+            <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
+            <div id="aircraft-list" style="clear: left;"></div>
+            <footer id="credits" style="opacity: 50%; text-align: center; margin-top: 25px; font-size: 12px;"</div>
+                Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet <span class="fi fis fi-ua"></span></a>
+                <br>
+                Map data © <a target="_blank" href="https://www.openstreetmap.org/copyright" id="map-data-credit">OpenStreetMap</a>
+                <br><br>
+                <a target="_blank" href="about:blank" id="map-data-credit">All acknowledgements &nearr;</a>
+            </footer>
         </div>
     </div>
 </body>

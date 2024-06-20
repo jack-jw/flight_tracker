@@ -135,9 +135,13 @@ document.addEventListener("DOMContentLoaded", function() {
         url.search = params.toString();
         history.pushState({}, '', url.toString());
 
+        document.getElementById('origin-input').outerHTML = document.getElementById('origin-input').outerHTML;
+        document.getElementById('destination-input').outerHTML = document.getElementById('destination-input').outerHTML;
+        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder"
+
+        selection = info = polylines = null;
         document.getElementById('main-container-main-view').style.display = null;
         document.getElementById('main-container-aircraft-view').style.display = "none";
-        selection = info = polylines = null;
         setMaxContainerHeight();
     }
 
@@ -372,9 +376,10 @@ document.addEventListener("DOMContentLoaded", function() {
             aircraftList.appendChild(listItem);
 
             document.querySelectorAll(`._${individual.icao24}`).forEach(element => {
-                element.addEventListener('click', function() {
+                element.addEventListener('click', function(event) {
                     socket.emit("lookup.all", individual.icao24, individual.callsign);
-                });
+                    event.stopPropagation();
+                }, true);
             });
         }
 
@@ -386,8 +391,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('lookup.all', function(response) {
+        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder"
         info = response;
-        console.log(info)
 
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
