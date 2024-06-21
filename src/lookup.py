@@ -20,11 +20,13 @@ Functions:
 
 import sqlite3
 from csv import reader
+import json
 import requests
 from bs4 import BeautifulSoup
 from paths import INSTANCE, LOCAL
 
 _DATABASE = f"{LOCAL}/local.db"
+_ICONTYPES = f"{LOCAL}/icontypes.json"
 _INSTANCE_DATABASE = f"{INSTANCE}/instance.db"
 
 _AIRCRAFT_URL = "https://opensky-network.org/datasets/metadata/aircraftDatabase.csv"
@@ -423,6 +425,42 @@ def aircraft(address):
         return result
 
     return {"icao24": address, "country": "XX"}
+
+def aircraft_icon(address):
+    """
+    Get the closest icon to an aircraft's actual type
+    Takes the aircraft's ICAO 24-bit address as a string
+    Returns the type code of the closest icon
+    """
+
+    db = sqlite3.connect(_DATABASE)
+    cursor = db.cursor()
+
+    while True:
+        try:
+            cursor.execute(f"SELECT type FROM aircraft WHERE `icao24` = '{address}'")
+            break
+        except sqlite3.OperationalError:
+            update("aircraft")
+
+    type = cursor.fetchone()
+    cursor.close()
+    db.close()
+
+    if type == None:
+        return {"icon": "generic", "length": 40}
+    else:
+        type = type[0]
+
+    with open(_ICONTYPES, encoding="utf-8") as f:
+        icontypes = json.load(f)
+
+    for icon_type, aircraft_types in icontypes.items():
+        if type in aircraft_types["types"]:
+            return {"icon": icon_type, "length": aircraft_types["length"]}
+
+    return {"icon": "generic", "length": 40}
+
 
 def airport(code):
     """

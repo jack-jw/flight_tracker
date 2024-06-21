@@ -307,27 +307,6 @@ document.addEventListener("DOMContentLoaded", function() {
         clearMap()
     });
 
-    // Define icons
-    const icons = {};
-
-    icons.plane = L.divIcon({
-    className: 'aircraft-icon',
-    html: '<img src="/icon/generic.svg"/>',
-    iconSize: [28, 28]
-    });
-
-    icons.helicopter = L.divIcon({
-    className: 'aircraft-icon',
-    html: '<div class="helicopter-icon">&#xFF0B;</div>',
-    iconSize: [32, 32]
-    });
-
-    icons.other = L.divIcon({
-    className: 'aircraft-icon',
-    html: '<div>&#x27A4;</div>',
-    iconSize: [32, 32]
-    });
-
     // MARK: - Aircraft
     let aircraft = {};
     let aircraftCount = 0;
@@ -351,7 +330,15 @@ document.addEventListener("DOMContentLoaded", function() {
             aircraftCount++
 
             if (typeof oldAircraft[key] === 'undefined') {
-                individual.marker = L.marker([individual.lat, individual.lng], { icon: icons[individual.icon] }).addTo(map);
+
+                individual.marker = L.marker([individual.lat, individual.lng], {
+                    icon: L.divIcon({
+                        className: 'aircraft-icon',
+                        html: `<img src="/icon/${individual.icon.icon}.svg"/>`,
+                        iconSize: [28, 28]
+                    })
+                }).addTo(map);
+
                 individual.marker.getElement().classList.add(`_${individual.icao24}`);
                 individual.marker.getElement().setAttribute('tabindex', '-1');
             }

@@ -10,6 +10,7 @@ Import json files from the openskies api for testing
 
 import json
 from random import shuffle
+import lookup
 
 def load(filename, gb_only=False, num_only=False):
     """
@@ -48,7 +49,6 @@ def load(filename, gb_only=False, num_only=False):
     for aircraft in state:
         # make right format and convert values
         dictionary = dict(zip(headers, aircraft))
-        dictionary["icon"] = "plane"
 
         if dictionary["alt"]:
             dictionary["alt"] = int(dictionary["alt"] * 3.281)
@@ -86,6 +86,7 @@ def load(filename, gb_only=False, num_only=False):
             if iterator == 500:
                 break
             else:
+                dictionary["icon"] = lookup.aircraft_icon(dictionary["icao24"])
                 if gb_only:
                     if 50 < dictionary["lat"] < 58 and -6 < dictionary["lng"] < 2:
                         result[dictionary["icao24"]] = dictionary
