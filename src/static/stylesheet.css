@@ -64,8 +64,6 @@ body {
 }
 
 .aircraft-icon {
-    width: 28px;
-    height: 28px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -75,8 +73,7 @@ body {
 }
 
 .aircraft-icon img {
-    height: 26px;
-    width: 26px;
+    width: 100%!important;
     filter: drop-shadow(0 0 5px black);
 }
 

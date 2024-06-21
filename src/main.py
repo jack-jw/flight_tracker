@@ -11,6 +11,7 @@ from os import urandom
 from os.path import exists
 from base64 import b64decode
 from threading import Thread
+from random import shuffle
 from flask import Flask, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 
@@ -23,6 +24,9 @@ def start():
     """
     Start the HTTP server
     """
+
+    # will be replaced by the actual decoder later
+    aircraft = openskies.load("../os.json", gb_only=False, num_only=True)
 
     app = Flask(__name__)
     app.config["SECRET_KEY"] = urandom(24)
@@ -51,14 +55,16 @@ def start():
             return image_content, 200, {"Content-Type": "image/jpeg"}
         return placeholder, 200, {"Content-Type": "image/png"}
 
-    @app.route('/icon/<path:type>')
+    @app.route("/icon/<path:type>")
     def serve_icon(type):
-        return send_from_directory('static/aircraft', type)
+        return send_from_directory("static/aircraft", type)
 
     @socketio.on("connect")
     def handle_connect():
-        # will be replaced by the actual decoder later
-        emit("decoder.get", openskies.load("../os.json", gb_only=False, num_only=True))
+        aircraft_list = list(aircraft.items())
+        shuffle(aircraft_list)
+        shuffled_aircraft = dict(aircraft_list[:500])
+        emit("decoder.get", shuffled_aircraft)
 
     @socketio.on("lookup.airport")
     def handle_airport_info_query(code, routing=None):
@@ -87,6 +93,11 @@ def start():
                 info["airline"]["name"] = info["aircraft"]["operator"]
             elif "owner" in info["aircraft"]:
                 info["airline"]["name"] = info["aircraft"]["owner"]
+            else:
+                info["airline"]["name"] = "Unknown Airline"
+
+        if "type" not in info["aircraft"]: info["aircraft"]["type"] = "Unknown Type"
+        if "reg" not in info["aircraft"]: info["aircraft"]["reg"] = "Unknown Reg"
 
         route = lookup.route(callsign)
         if route:

@@ -389,13 +389,13 @@ document.addEventListener("DOMContentLoaded", function() {
         url.search = params.toString();
         history.pushState({}, '', url.toString());
 
-        if (info.origin === null) {
+        if (!info.origin) {
             info.origin = {};
             info.origin.iata = '';
             info.origin.muni = 'Origin';
         }
 
-        if (info.destination === null) {
+        if (!info.destination) {
             info.destination = {};
             info.destination.iata = '';
             info.destination.muni = 'Destination';
@@ -410,10 +410,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             info.radioCallsign = info.radioCallsign.trim();
         } catch {}
-
-        if (typeof info.aircraft.reg == 'undefined') { info.aircraft.reg = 'Unknown Reg' }
-        if (typeof info.aircraft.type == 'undefined') { info.aircraft.type = 'Unknown Type' }
-        if (typeof info.airline.name == 'undefined') { info.airline.name = 'Unknown Airline' }
 
         selection = aircraft[info.aircraft.icao24];
 
