@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     icon: L.divIcon({
                         className: 'aircraft-icon',
                         html: `<img src="/icon/${individual.icon.icon}.svg"/>`,
-                        iconSize: [28, 28]
+                        iconSize: [individual.icon.size, individual.icon.size]
                     })
                 }).addTo(map);
 

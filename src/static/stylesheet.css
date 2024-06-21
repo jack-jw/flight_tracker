@@ -318,6 +318,7 @@ hr {
     transform: translateX(-50%);
     height: 85%;
     padding-top: 6px;
+    fill: var(--colour)
 }
 
 #iata-inputs-parent {

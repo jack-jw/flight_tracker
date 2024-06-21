@@ -26,12 +26,12 @@ from bs4 import BeautifulSoup
 from paths import INSTANCE, LOCAL
 
 _DATABASE = f"{LOCAL}/local.db"
-_ICONTYPES = f"{LOCAL}/icontypes.json"
 _INSTANCE_DATABASE = f"{INSTANCE}/instance.db"
 
 _AIRCRAFT_URL = "https://opensky-network.org/datasets/metadata/aircraftDatabase.csv"
 _AIRPORTS_URL = "https://davidmegginson.github.io/ourairports-data/airports.csv"
 _AIRLINE_CODES_WIKI_URL = "https://en.wikipedia.org/wiki/List_of_airline_codes"
+_ICONTYPES_URL = "https://raw.githubusercontent.com/jack-jw/flight_tracker/main/icontypes.csv"
 _PREFIXES_URL = "https://raw.githubusercontent.com/jack-jw/flight_tracker/main/prefixes.csv"
 
 # MARK: - Internal functions
@@ -127,7 +127,8 @@ def _get_row(table, search_column, query):
     """
 
     db_path = _INSTANCE_DATABASE if table == "routes" else _DATABASE
-    db = sqlite3.connect(db_path)
+    check_thread = True if table == "routes" else False
+    db = sqlite3.connect(db_path, check_same_thread=check_thread)
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
 
@@ -195,7 +196,7 @@ def check():
 
     main_db = sqlite3.connect(_DATABASE)
     cursor = main_db.cursor()
-    for table in ("airlines", "aircraft", "airports", "prefixes"):
+    for table in ("airlines", "aircraft", "airports", "icontypes", "prefixes"):
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
         if cursor.fetchone() is None:
             print(f"Creating {table} table")
@@ -274,6 +275,15 @@ def update(table):
     elif table == "airlines":
         _get_airlines_table()
 
+    elif table == "icontypes":
+        icontypes_headers = (
+            "type",
+            "icon",
+            "size"
+        )
+
+        _csv_to_db(_DATABASE, _ICONTYPES_URL, "icontypes", icontypes_headers)
+
     elif table == "prefixes":
         prefix_headers = (
             "prefix",
@@ -296,7 +306,7 @@ def update(table):
         instance_db.close()
 
     elif table == "all":
-        for table_name in ("aircraft", "airports", "airlines", "prefixes", "routes"):
+        for table_name in ("aircraft", "airports", "airlines", "icontypes", "prefixes", "routes"):
             update(table_name)
 
     else:
@@ -398,7 +408,7 @@ def airline(callsign):
         return None
 
     code = callsign.upper()[:3]
-    result = _get_row("airlines", "icao",code)
+    result = _get_row("airlines", "icao", code)
     if result:
         return result
 
@@ -415,7 +425,7 @@ def aircraft(address):
         return None
 
     address = address.lower()
-    result = _get_row("aircraft", "icao24",address)
+    result = _get_row("aircraft", "icao24", address)
     if result:
         if "reg" in result:
             result["country"] = _get_country_from_reg(result["reg"])
@@ -433,33 +443,17 @@ def aircraft_icon(address):
     Returns the type code of the closest icon
     """
 
-    db = sqlite3.connect(_DATABASE)
-    cursor = db.cursor()
+    if not address:
+        return {"icon": "generic", "size": 28}
 
-    while True:
-        try:
-            cursor.execute(f"SELECT type FROM aircraft WHERE `icao24` = '{address}'")
-            break
-        except sqlite3.OperationalError:
-            update("aircraft")
+    address = address.lower()
+    aircraft_lookup = aircraft(address)
+    if "type" in aircraft_lookup:
+        result = _get_row("icontypes", "type", aircraft_lookup["type"])
+        if result:
+            return result
 
-    type = cursor.fetchone()
-    cursor.close()
-    db.close()
-
-    if type == None:
-        return {"icon": "generic", "length": 40}
-    else:
-        type = type[0]
-
-    with open(_ICONTYPES, encoding="utf-8") as f:
-        icontypes = json.load(f)
-
-    for icon_type, aircraft_types in icontypes.items():
-        if type in aircraft_types["types"]:
-            return {"icon": icon_type, "length": aircraft_types["length"]}
-
-    return {"icon": "generic", "length": 40}
+    return {"icon": "generic", "size": 28}
 
 
 def airport(code):
@@ -475,10 +469,10 @@ def airport(code):
     code = code.upper()
     if len(code) == 3:
         code = code.upper()
-        return _get_row("airports", "iata",code)
+        return _get_row("airports", "iata", code)
     if len(code) == 4:
         code = code.upper()
-        return _get_row("airports", "icao",code)
+        return _get_row("airports", "icao", code)
 
     return None
 
@@ -490,5 +484,5 @@ def route(callsign):
     """
 
     callsign = callsign.upper()
-    result = _get_row("routes", "callsign",callsign)
+    result = _get_row("routes", "callsign", callsign)
     return result
