@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 94 96">
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 75.68 78.44">
   <defs>
     <style>
       .cls-1 {
-        filter: url(#drop-shadow-2);
+        fill: url(#linear-gradient);
+        filter: url(#drop-shadow-1);
       }
 
       .cls-1, .cls-2, .cls-3 {
-        fill: #fff;
         stroke-width: 0px;
       }
 
       .cls-2 {
-        filter: url(#drop-shadow-1);
+        fill: url(#linear-gradient-2);
+        filter: url(#drop-shadow-2);
       }
 
       .cls-3 {
-        filter: url(#drop-shadow-3);
+        fill: #fff;
       }
     </style>
+    <linearGradient id="linear-gradient" x1="26.18" y1="32.31" x2="26.18" y2="24.9" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#bfbfbf"/>
+      <stop offset=".3" stop-color="#fcfcfc"/>
+    </linearGradient>
     <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
       <feOffset dx="0" dy="0"/>
       <feGaussianBlur result="blur" stdDeviation="2.83"/>
@@ -26,6 +31,7 @@
       <feComposite in2="blur" operator="in"/>
       <feComposite in="SourceGraphic"/>
     </filter>
+    <linearGradient id="linear-gradient-2" x1="49.5" x2="49.5" xlink:href="#linear-gradient"/>
     <filter id="drop-shadow-2" filterUnits="userSpaceOnUse">
       <feOffset dx="0" dy="0"/>
       <feGaussianBlur result="blur-2" stdDeviation="2.83"/>
@@ -33,21 +39,14 @@
       <feComposite in2="blur-2" operator="in"/>
       <feComposite in="SourceGraphic"/>
     </filter>
-    <filter id="drop-shadow-3" filterUnits="userSpaceOnUse">
-      <feOffset dx="0" dy="0"/>
-      <feGaussianBlur result="blur-3" stdDeviation="2.83"/>
-      <feFlood flood-color="#000" flood-opacity=".15"/>
-      <feComposite in2="blur-3" operator="in"/>
-      <feComposite in="SourceGraphic"/>
-    </filter>
   </defs>
   <g id="Layer_1-2" data-name="Layer 1">
     <g id="AT72">
       <g>
-        <path class="cls-2" d="M34.93,33.72c-.37.64-.9,2.39-.9,7.22h2.47c0-4.83-.54-6.59-.9-7.22-.15-.26-.51-.26-.66,0Z"/>
-        <path class="cls-1" d="M58.91,33.72c.37.64.9,2.39.9,7.22h-2.47c0-4.83.54-6.59.9-7.22.15-.26.51-.26.66,0Z"/>
+        <path class="cls-1" d="M25.85,25.09c-.37.64-.9,2.39-.9,7.22h2.47c0-4.83-.54-6.59-.9-7.22-.15-.26-.51-.26-.66,0Z"/>
+        <path class="cls-2" d="M49.83,25.09c.37.64.9,2.39.9,7.22h-2.47c0-4.83.54-6.59.9-7.22.15-.26.51-.26.66,0Z"/>
       </g>
-      <path class="cls-3" d="M46.9,87.08c.17,0,.24-.84.26-1.24,0-.12.1-.2.21-.21l9.01-.52c.4-.02.72-.36.72-.76v-1.26c0-.61-.43-1.14-1.03-1.26l-7.45-1.53c-.24-.05-.4-.28-.35-.52.47-2.29,2.67-13.16,2.67-17.48v-13.38c0-.44.36-.81.81-.81h7.41c.66,0,1.32-.02,1.99-.05l22.48-1.24c.63-.03,1.12-.55,1.12-1.18v-1.29c0-.94-.72-1.72-1.66-1.79l-21.53-1.69c-.93-.07-1.87-.11-2.81-.11h-7c-.44,0-.81-.36-.81-.81v-23.05c0-4.24-1.57-6.57-2.75-7.73-.72-.7-1.86-.7-2.58,0-1.18,1.15-2.75,3.48-2.75,7.73v23.05c0,.44-.36.81-.81.81h-7c-.94,0-1.87.04-2.81.11l-21.53,1.69c-.94.07-1.66.85-1.66,1.79v1.29c0,.63.49,1.15,1.12,1.18l22.48,1.24c.66.04,1.32.05,1.99.05h7.41c.44,0,.81.36.81.81v13.38c0,4.32,2.2,15.19,2.67,17.48.05.24-.11.47-.35.52l-7.45,1.53c-.6.12-1.03.65-1.03,1.26v1.26c0,.41.32.74.72.76l8.99.52c.12,0,.21.1.21.21.02.4.1,1.24.26,1.24Z"/>
+      <path class="cls-3" d="M37.83,78.44c.17,0,.24-.84.26-1.24,0-.12.1-.2.21-.21l9.01-.52c.4-.02.72-.36.72-.76v-1.26c0-.61-.43-1.14-1.03-1.26l-7.45-1.53c-.24-.05-.4-.28-.35-.52.47-2.29,2.67-13.16,2.67-17.48v-13.38c0-.44.36-.81.81-.81h7.41c.66,0,1.32-.02,1.99-.05l22.48-1.24c.63-.03,1.12-.55,1.12-1.18v-1.29c0-.94-.72-1.72-1.66-1.79l-21.53-1.69c-.93-.07-1.87-.11-2.81-.11h-7c-.44,0-.81-.36-.81-.81V8.25c0-4.24-1.57-6.57-2.75-7.73-.72-.7-1.86-.7-2.58,0-1.18,1.15-2.75,3.48-2.75,7.73v23.05c0,.44-.36.81-.81.81h-7c-.94,0-1.87.04-2.81.11l-21.53,1.69c-.94.07-1.66.85-1.66,1.79v1.29c0,.63.49,1.15,1.12,1.18l22.48,1.24c.66.04,1.32.05,1.99.05h7.41c.44,0,.81.36.81.81v13.38c0,4.32,2.2,15.19,2.67,17.48.05.24-.11.47-.35.52l-7.45,1.53c-.6.12-1.03.65-1.03,1.26v1.26c0,.41.32.74.72.76l8.99.52c.12,0,.21.1.21.21.02.4.1,1.24.26,1.24Z"/>
     </g>
   </g>
 </svg>

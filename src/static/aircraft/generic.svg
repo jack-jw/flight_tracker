@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 127 131">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #fff;
-        filter: url(#drop-shadow-1);
-        stroke-width: 0px;
-      }
-    </style>
-    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
-      <feOffset dx="0" dy="0"/>
-      <feGaussianBlur result="blur" stdDeviation="2.83"/>
-      <feFlood flood-color="#000" flood-opacity=".15"/>
-      <feComposite in2="blur" operator="in"/>
-      <feComposite in="SourceGraphic"/>
-    </filter>
-  </defs>
-  <g id="Layer_1-2" data-name="Layer 1">
-    <path class="cls-1" d="M52.75,27.67s0,13.43,0,23.65c0,1.01-.46,1.97-1.26,2.59L10.86,86c-3.58,2.83-.47,8.5,3.84,7l38.55-13.43c.57,11.42,1.48,22.8,2.11,29.9l-14.08,6.13c-3.52,1.53-2.43,6.79,1.41,6.79h42.27c3.84,0,4.94-5.26,1.41-6.79l-14.09-6.13c.62-7.13,1.54-18.55,2.11-29.9l38.56,13.44c4.31,1.5,7.43-4.17,3.84-7l-40.63-32.09c-.79-.63-1.26-1.58-1.26-2.59,0-10.23,0-23.65,0-23.65,0,0,.02-18.66-11.09-18.66s-11.09,18.66-11.09,18.66Z"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 127 131">
+    <path fill="white" d="M52.75,27.67s0,13.43,0,23.65c0,1.01-.46,1.97-1.26,2.59L10.86,86c-3.58,2.83-.47,8.5,3.84,7l38.55-13.43c.57,11.42,1.48,22.8,2.11,29.9l-14.08,6.13c-3.52,1.53-2.43,6.79,1.41,6.79h42.27c3.84,0,4.94-5.26,1.41-6.79l-14.09-6.13c.62-7.13,1.54-18.55,2.11-29.9l38.56,13.44c4.31,1.5,7.43-4.17,3.84-7l-40.63-32.09c-.79-.63-1.26-1.58-1.26-2.59,0-10.23,0-23.65,0-23.65,0,0,.02-18.66-11.09-18.66s-11.09,18.66-11.09,18.66Z"/>
 </svg>

@@ -1,14 +1,6 @@
 /* static/global.css */
 
 @font-face {
-    font-family: icons;
-    font-style: normal;
-    font-weight: 400;
-    font-display: block;
-    src: url('./icons.woff2') format('woff2');
-}
-
-@font-face {
     font-family: Inter;
     font-style: normal;
     font-weight: 100 900;
@@ -25,7 +17,7 @@
 }
 
 :root {
-    --default-fonts: Inter, icons, -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
+    --default-fonts: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
     font-family: var(--default-fonts);
     font-feature-settings: 'liga' 1, 'calt' 1;
     --colour: black;
@@ -72,18 +64,20 @@ body {
 }
 
 .aircraft-icon {
-    text-align: center;
-    line-height: 32px;
-    width: 32px;
-    height: 32px;
-    margin-top: -16px;
-    margin-left: -16px;
-    font-size: 24px;
-    color: white;
-    text-shadow: 0 0 5px black;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transform-origin: center;
     cursor: pointer;
     transition: opacity 0.5s ease, transform 0.2s linear;
+}
+
+.aircraft-icon img {
+    height: 26px;
+    width: 26px;
+    filter: drop-shadow(0 0 5px black);
 }
 
 .aircraft-icon:hover {
@@ -278,7 +272,7 @@ hr {
     border-style: solid;
 }
 
-#iata-inputs-plane, .iata-input {
+.iata-input {
     font-size: 32px;
     font-weight: bold;
 }
@@ -325,6 +319,8 @@ hr {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    height: 85%;
+    padding-top: 6px;
 }
 
 #iata-inputs-parent {

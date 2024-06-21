@@ -11,7 +11,7 @@ from os import urandom
 from os.path import exists
 from base64 import b64decode
 from threading import Thread
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 
 from paths import INSTANCE, INSTANCE_IMAGES
@@ -50,6 +50,10 @@ def start():
                 image_content = f.read()
             return image_content, 200, {"Content-Type": "image/jpeg"}
         return placeholder, 200, {"Content-Type": "image/png"}
+
+    @app.route('/icon/<path:type>')
+    def serve_icon(type):
+        return send_from_directory('static/aircraft', type)
 
     @socketio.on("connect")
     def handle_connect():

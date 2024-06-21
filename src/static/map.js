@@ -149,11 +149,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const marker = anAircraft.marker;
 
         if (anAircraft.icon !== 'helicopter') {
-            const iconHeading = anAircraft.hdg - 90;
             const markerElement = marker.getElement();
-            const markerElementInner = markerElement.querySelector('div');
+            const markerElementInner = markerElement.querySelector('img');
             markerElementInner.style.transition = 'transform 0.5s ease';
-            markerElementInner.style.transform = 'rotate(' + iconHeading + 'deg)';
+            markerElementInner.style.transform = 'rotate(' + anAircraft.hdg + 'deg)';
         }
 
         const speed = anAircraft.speed / (1.944 * 5);
@@ -313,8 +312,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     icons.plane = L.divIcon({
     className: 'aircraft-icon',
-    html: '<div>&#x2708;</div>',
-    iconSize: [32, 32]
+    html: '<img src="/icon/generic.svg"/>',
+    iconSize: [28, 28]
     });
 
     icons.helicopter = L.divIcon({
