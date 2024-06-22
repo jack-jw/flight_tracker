@@ -20,7 +20,6 @@ Functions:
 
 import sqlite3
 from csv import reader
-import json
 import requests
 from bs4 import BeautifulSoup
 from paths import INSTANCE, LOCAL
@@ -78,7 +77,7 @@ def _get_airlines_table():
     main_db.commit()
     main_db.close()
 
-def _csv_to_db(database, url, table_name, column_names):
+def _csv_to_db(database, url, table_name, column_names, index_column=False):
     """
     Internal, use update() function to update a DB
 
@@ -113,6 +112,9 @@ def _csv_to_db(database, url, table_name, column_names):
                        f"VALUES ({', '.join(['?' for _ in range(len(column_names))])}"
                        ")", row)
 
+    if index_column:
+        cursor.execute(f"CREATE INDEX idx_{index_column} ON {table_name}({index_column})")
+
     cursor.close()
     main_db.commit()
     main_db.close()
@@ -127,7 +129,7 @@ def _get_row(table, search_column, query):
     """
 
     db_path = _INSTANCE_DATABASE if table == "routes" else _DATABASE
-    check_thread = True if table == "routes" else False
+    check_thread = table == "routes"
     db = sqlite3.connect(db_path, check_same_thread=check_thread)
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
@@ -246,7 +248,7 @@ def update(table):
             "categorydesc"
         )
 
-        _csv_to_db(_DATABASE, _AIRCRAFT_URL, "aircraft", aircraft_headers)
+        _csv_to_db(_DATABASE, _AIRCRAFT_URL, "aircraft", aircraft_headers, "icao24")
 
     elif table == "airports":
         airport_headers = (
@@ -282,7 +284,7 @@ def update(table):
             "size"
         )
 
-        _csv_to_db(_DATABASE, _ICONTYPES_URL, "icontypes", icontypes_headers)
+        _csv_to_db(_DATABASE, _ICONTYPES_URL, "icontypes", icontypes_headers, "type")
 
     elif table == "prefixes":
         prefix_headers = (
@@ -290,7 +292,7 @@ def update(table):
             "country"
         )
 
-        _csv_to_db(_DATABASE, _PREFIXES_URL, "prefixes", prefix_headers)
+        _csv_to_db(_DATABASE, _PREFIXES_URL, "prefixes", prefix_headers, "prefix")
 
     elif table == "routes":
         instance_db = sqlite3.connect(_INSTANCE_DATABASE)
@@ -300,6 +302,8 @@ def update(table):
         if cursor.fetchone() is None:
             cursor.execute("CREATE TABLE routes "
                            "('callsign' TEXT, 'origin' TEXT, 'destination' TEXT)")
+
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_callsign ON routes(callsign)")
 
         cursor.close()
         instance_db.commit()
@@ -404,9 +408,6 @@ def airline(callsign):
     if not callsign:
         return None
 
-    if not any(char.isdigit() for char in callsign):
-        return None
-
     code = callsign.upper()[:3]
     result = _get_row("airlines", "icao", code)
     if result:
@@ -450,7 +451,7 @@ def aircraft_icon(address):
     aircraft_lookup = aircraft(address)
     if "type" in aircraft_lookup:
         result = _get_row("icontypes", "type", aircraft_lookup["type"])
-        if result:
+        if "icon" in result:
             return result
 
     return {"icon": "generic", "size": 28}

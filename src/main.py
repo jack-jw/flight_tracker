@@ -7,7 +7,7 @@ Functions:
     start()
 """
 
-from os import urandom
+from os import urandom, getlogin
 from os.path import exists
 from base64 import b64decode
 from threading import Thread
@@ -15,10 +15,49 @@ from random import shuffle
 from flask import Flask, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 
-from paths import INSTANCE, INSTANCE_IMAGES
+from paths import INSTANCE_IMAGES, LOCAL_IMAGES
 import lookup
 import jetphotos
 import openskies
+
+nato = {
+    "0": "ZERO",
+    "1": "ONE",
+    "2": "TWO",
+    "3": "THREE",
+    "4": "FOUR",
+    "5": "FIVE",
+    "6": "SIX",
+    "7": "SEVEN",
+    "8": "EIGHT",
+    "9": "NINER",
+    "A": "ALPHA",
+    "B": "BRAVO",
+    "C": "CHARLIE",
+    "D": "DELTA",
+    "E": "ECHO",
+    "F": "FOXTROT",
+    "G": "GOLF",
+    "H": "HOTEL",
+    "I": "INDIA",
+    "J": "JULIET",
+    "K": "KILO",
+    "L": "LIMA",
+    "M": "MIKE",
+    "N": "NOVEMBER",
+    "O": "OSCAR",
+    "P": "PAPA",
+    "Q": "QUEBEC",
+    "R": "ROMEO",
+    "S": "SIERRA",
+    "T": "TANGO",
+    "U": "UNIFORM",
+    "V": "VICTOR",
+    "W": "WHISKEY",
+    "X": "X-RAY",
+    "Y": "YANKEE",
+    "Z": "ZULU"
+}
 
 def start():
     """
@@ -26,44 +65,40 @@ def start():
     """
 
     # will be replaced by the actual decoder later
-    aircraft = openskies.load("../os.json", num_only=True)
+    aircraft = openskies.load("../os.json", num_only=False)
 
-    app = Flask(__name__)
+    app = Flask("flight_tracker")
     app.config["SECRET_KEY"] = urandom(24)
     socketio = SocketIO(app)
 
     @app.route("/")
     def index():
-        return render_template("map.html", initial="★", colour="#3478F6")
+        return render_template("map.html", initial=getlogin()[:1].upper(), colour="#3478F6")
 
     @app.route("/image/aircraft/<tail>")
-    def serve_image(tail):
+    def serve_aircraft_image(tail):
         placeholder = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAA"
                                 "AAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
-        if (tail == "Unknown Reg") or (tail == "placeholder"):
+        if tail in ("Unknown Reg", "placeholder"):
             return placeholder, 200, {"Content-Type": "image/png"}
 
         if exists(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg"):
-            with open(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg", "rb") as f:
-                image_content = f.read()
-            return image_content, 200, {"Content-Type": "image/jpeg"}
+            return send_from_directory(INSTANCE_IMAGES, f"aircraft-{tail}.jpeg")
 
         image = jetphotos.thumb(tail)
         if image:
-            with open(image, "rb") as f:
-                image_content = f.read()
-            return image_content, 200, {"Content-Type": "image/jpeg"}
+            return send_from_directory(LOCAL_IMAGES, image)
         return placeholder, 200, {"Content-Type": "image/png"}
 
-    @app.route("/icon/<path:type>")
-    def serve_icon(type):
-        return send_from_directory("static/aircraft", type)
+    @app.route("/image/icon/<path:icontype>")
+    def serve_icon(icontype):
+        return send_from_directory("static/aircraft", icontype)
 
     @socketio.on("connect")
     def handle_connect():
         aircraft_list = list(aircraft.items())
         shuffle(aircraft_list)
-        shuffled_aircraft = dict(aircraft_list[:500])
+        shuffled_aircraft = dict(aircraft_list[:750])
         emit("decoder.get", shuffled_aircraft)
 
     @socketio.on("lookup.airport")
@@ -85,8 +120,14 @@ def start():
         info = {}
         info["airline"] = lookup.airline(callsign)
         info["aircraft"] = lookup.aircraft(aircraft_address)
-
         info["callsign"] = callsign
+
+        if "radio" in info["airline"]:
+            info["radio"] = info["airline"]["radio"]
+            for char in callsign[3:]:
+                info["radio"] += " " + nato[char]
+        else:
+            info["radio"] = ""
 
         if "name" not in info["airline"]:
             if "operator" in info["aircraft"]:
@@ -96,8 +137,10 @@ def start():
             else:
                 info["airline"]["name"] = "Unknown Airline"
 
-        if "type" not in info["aircraft"]: info["aircraft"]["type"] = "Unknown Type"
-        if "reg" not in info["aircraft"]: info["aircraft"]["reg"] = "Unknown Reg"
+        if "type" not in info["aircraft"]:
+            info["aircraft"]["type"] = "Unknown Type"
+        if "reg" not in info["aircraft"]:
+            info["aircraft"]["reg"] = "Unknown Reg"
 
         route = lookup.route(callsign)
         if route:
@@ -115,6 +158,7 @@ def start():
 
 if __name__ == "__main__":
     print("""
+
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣶⡀
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣦
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⣷⡄
@@ -132,7 +176,7 @@ if __name__ == "__main__":
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⡿⠋
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠟
  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠁
- 
+
     """)
     lookup.check()
     start()

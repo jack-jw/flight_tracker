@@ -1,14 +1,14 @@
 # jetphotos.py
 
 """
-Get urls for images of aircraft from JetPhotos
+Get urls for images of aircraft from JetPhotos and optionally cache them
 
 Functions:
     full_url()
     thumb_url()
 
-    full()
-    thumb()
+    full() - caches
+    thumb() - caches
 """
 
 from os.path import exists
@@ -70,19 +70,20 @@ def full(reg):
     Caches images locally for faster loading times
 
     Takes a registration number as a string
-    Returns a URL as a string (or None if not found)
+    Returns the filename of the image relative to the local images directory
     """
 
     image = f"{LOCAL_IMAGES}/jp-full-{reg}.jpeg"
+    image_filename = f"jp-full-{reg}.jpeg"
     if exists(image):
-        return image
+        return image_filename
 
     url = full_url(reg)
     if url:
         response = get(url, timeout=60)
         with open(image, "wb") as image_file:
             image_file.write(response.content)
-        return image
+        return image_filename
 
     return None
 
@@ -94,18 +95,19 @@ def thumb(reg):
     Caches images locally for faster loading times
 
     Takes a registration number as a string
-    Returns a URL to JetPhotos as a string (or None if not found)
+    Returns the filename of the image relative to the local images directory
     """
 
     image = f"{LOCAL_IMAGES}/jp-thumb-{reg}.jpeg"
+    image_filename = f"jp-thumb-{reg}.jpeg"
     if exists(image):
-        return image
+        return image_filename
 
     url = thumb_url(reg)
     if url:
         response = get(url, timeout=60)
         with open(image, "wb") as image_file:
             image_file.write(response.content)
-        return image
+        return image_filename
 
     return None

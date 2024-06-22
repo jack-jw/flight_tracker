@@ -18,6 +18,6 @@ for icon_type, aircraft_types in icontypes.items():
     for aircraft in aircraft_types["types"]:
         csv_contents.append([aircraft, icon_type, aircraft_types["size"]])
 
-with open("icontypes.csv", "w", newline="") as cf:
+with open("icontypes.csv", "w", newline="", encoding="utf-8") as cf:
     writer = csv.writer(cf)
     writer.writerows(csv_contents)

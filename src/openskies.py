@@ -16,8 +16,8 @@ import lookup
 def _progress(iteration, total, message=''):
     percent = f"{100 * (iteration / float(total)):.1f}"
     filled_length = int(50 * iteration // total)
-    bar = "█" * filled_length + "-" * (50 - filled_length)
-    progress_line = f"\r|{bar}| {percent}% {message}"
+    progress_bar = "█" * filled_length + " " * (50 - filled_length)
+    progress_line = f"\r{progress_bar} {percent}% {message}"
     print(progress_line, end="\r")
 
 
@@ -45,12 +45,6 @@ def _format(individual):
 
     result = dict(zip(headers, individual))
 
-    try:
-        flight_number = int(result["callsign"][3:])
-        result["callsign"] = result["callsign"][:3] + str(flight_number)
-    except ValueError:
-        pass
-
     # delete unnecessary keys to save bandwidth
     for delete in ("origin_country",
                    "time_position",
@@ -70,7 +64,7 @@ def _format(individual):
     if all(result[key] for key in ["lat", "lng", "hdg", "alt", "speed", "callsign"]):
         result["alt"] = int(result["alt"] * 3.281) # to ft
         result["speed"] = int(result["speed"] * 1.944) # to kts
-        result["callsign"] = result["callsign"].strip()
+        result["callsign"] = (result["callsign"][:3] + result["callsign"][3:].lstrip("0")).strip()
         result["icon"] = lookup.aircraft_icon(result["icao24"])
         return result
     return None
@@ -91,6 +85,7 @@ def load(filename, num_only=False):
     state_len = len(state)
     result = {}
     iterator = 0
+    loaded = 0
 
     with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
         formatted_aircraft = {executor.submit(_format, aircraft): aircraft for aircraft in state}
@@ -99,11 +94,11 @@ def load(filename, num_only=False):
             iterator += 1
             fm_aircraft = future.result()
             if fm_aircraft:
-                if num_only:
-                    if fm_aircraft["callsign"][3:].isdigit():
-                        result[fm_aircraft["icao24"]] = fm_aircraft
-                        _progress(iterator, state_len, message=fm_aircraft["callsign"])
-                else:
-                    result[fm_aircraft["icao24"]] = fm_aircraft
-    print()
+                if num_only and not fm_aircraft["callsign"][3:].isdigit():
+                    continue
+                loaded += 1
+                result[fm_aircraft["icao24"]] = fm_aircraft
+                _progress(iterator, state_len, message=fm_aircraft["callsign"])
+
+    print(f"\n{loaded} aircraft loaded out of {iterator} in set")
     return result

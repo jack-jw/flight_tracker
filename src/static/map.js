@@ -10,7 +10,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     let startContainerY, startContainerHeight, containerMomentum, maxContainerHeight;
     let selection = info = polylines = null;
-    const digitWords = ['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINER'];
 
     const socket = io();
     socket.on('disconnect', function() {
@@ -148,12 +147,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function setAircraft(anAircraft) {
         const marker = anAircraft.marker;
 
-        if (anAircraft.icon !== 'helicopter') {
-            const markerElement = marker.getElement();
-            const markerElementInner = markerElement.querySelector('img');
-            markerElementInner.style.transition = 'transform 0.5s ease';
-            markerElementInner.style.transform = 'rotate(' + anAircraft.hdg + 'deg)';
-        }
+        const markerElement = marker.getElement();
+        const markerElementInner = markerElement.querySelector('img');
+        markerElementInner.style.transition = 'transform 0.5s ease';
+        markerElementInner.style.transform = 'rotate(' + anAircraft.hdg + 'deg)';
 
         const speed = anAircraft.speed / (1.944 * 5);
 
@@ -334,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 individual.marker = L.marker([individual.lat, individual.lng], {
                     icon: L.divIcon({
                         className: 'aircraft-icon',
-                        html: `<img src="/icon/${individual.icon.icon}.svg"/>`,
+                        html: `<img src="/image/icon/${individual.icon.icon}.svg"/>`,
                         iconSize: [individual.icon.size, individual.icon.size]
                     })
                 }).addTo(map);
@@ -348,14 +345,12 @@ document.addEventListener("DOMContentLoaded", function() {
             const listItem = document.createElement('div');
             listItem.setAttribute('class', `_${individual.icao24}`);
             listItem.innerHTML = `
-                <div height="95px">
+                <div class="aircraft-list-airline-logo" style="background-image: url(https://www.flightaware.com/images/airline_logos/180px/${individual.callsign.slice(0,3)}.png)">
+                </div>
 
-                    <div style="position: absolute; margin-left: 5px; background-image: url(https://www.flightaware.com/images/airline_logos/180px/${individual.callsign.slice(0,3)}.png); background-size: contain; background-position: center; background-repeat: no-repeat; height: 75px; width: 75px;"></div>
-
-                    <div style="margin-left: 100px">
-                        <h3>${individual.callsign}</h3>
-                        <p>${individual.speed} KTS, ${individual.alt} FT, ${individual.hdg}º</p>
-                    </div>
+                <div>
+                    <div class="aircraft-list-callsign">${individual.callsign}</div>
+                    <div class="aircraft-list-metrics">${individual.speed} KTS, ${individual.alt} FT, ${Math.round(individual.hdg)}º</div>
                 </div>
             `;
 
@@ -401,16 +396,6 @@ document.addEventListener("DOMContentLoaded", function() {
             info.destination.muni = 'Destination';
         }
 
-        try {
-            info.radioCallsign = info.airline.radio + ' ';
-            const flightNumber = info.callsign.slice(3).trim();
-            for (let i = 0; i < flightNumber.length; i++) {
-                const digit = parseInt(flightNumber[i]);  // only works with numerical callsigns
-                info.radioCallsign += digitWords[digit] + ' ';
-            }
-            info.radioCallsign = info.radioCallsign.trim();
-        } catch {}
-
         selection = aircraft[info.aircraft.icao24];
 
         Object.keys(aircraft).forEach(function(key) {
@@ -428,7 +413,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
         document.getElementById('aircraft-airline-name').textContent = info.airline.name;
         document.getElementById('aircraft-callsign').textContent = info.callsign;
-        document.getElementById('aircraft-callsign').title = info.radioCallsign;
+        document.getElementById('aircraft-callsign').title = info.radio;
         document.getElementById('aircraft-route-origin').textContent = info.origin.muni;
         document.getElementById('aircraft-route-destination').textContent = info.destination.muni;
 

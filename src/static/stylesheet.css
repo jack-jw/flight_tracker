@@ -73,20 +73,13 @@ body {
 }
 
 .aircraft-icon img {
+    height: 100%!important;
     width: 100%!important;
     filter: drop-shadow(0 0 5px black);
 }
 
 .aircraft-icon:hover {
     opacity: 100%!important;
-}
-
-.helicopter-icon {
-    animation: helicopter-spin 0.5s linear infinite
-}
-
-@keyframes helicopter-spin {
-    100% { transform: rotate(360deg) }
 }
 
 #resize-handle {
@@ -151,7 +144,9 @@ body {
 #aircraft-list > div {
     transition: background-color 0.1s ease, border-top 0.1s ease;
     cursor: pointer;
-    padding: 5px;
+    height: 75px;
+    display: flex;
+    align-items: center;
 }
 
 #aircraft-list > div:hover {
@@ -160,8 +155,40 @@ body {
     border-top: 0.1px solid transparent;
 }
 
-#aircraft-list > div:hover + div, #aircraft-list > div:hover + footer {
+#aircraft-list > div:hover + div, #aircraft-list > div:hover + footer, #aircraft-list > div:active + div, #aircraft-list > div:active + footer {
     border-top: 0.1px solid transparent;
+}
+
+#aircraft-list > div:active {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.aircraft-list-airline-logo {
+    position: absolute;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 50px;
+    aspect-ratio: 1;
+    margin-left: 12.5px
+}
+
+.aircraft-list-callsign, .aircraft-list-metrics {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-left: 80px;
+}
+
+.aircraft-list-callsign {
+    font-weight: bold;
+    font-size: 18px;
+
+}
+
+.aircraft-list-metrics {
+    color: grey;
 }
 
 #aircraft-list footer {
@@ -378,6 +405,12 @@ hr {
 
 .fis {
     border-radius: 50%;
+    position: absolute;
+    margin-top: 2px;
+}
+
+#aircraft-reg {
+    margin-left: 2.25ch;
 }
 
 a, a:hover, a:active, a:visited {
