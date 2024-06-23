@@ -77,7 +77,7 @@ def start():
 
     @app.route("/my")
     def serve_my_flights():
-        return render_template("my_flights.html", initial=getlogin()[:1].upper(), colour="#3478F6")
+        return render_template("my_flights.html", name=getlogin(), initial=getlogin()[:1].upper(), colour="#3478F6")
 
     @app.route("/image/aircraft/<tail>")
     def serve_aircraft_image(tail):

@@ -60,8 +60,13 @@ body {
     filter: opacity(50%) var(--map-filters);
 }
 
-.aircraft-icon {
-    font-family: var(--default-fonts);
+.my-flights-airport-icon {
+    height: 100%;
+    width: 100%;
+    outline: solid #FF9500 2px;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
 }
 
 .aircraft-icon {
@@ -97,24 +102,16 @@ body {
     box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
     background-color: var(--background-colour);
     color: var(--colour);
-    border-radius: 10px 10px 0 0;
     word-wrap: break-word;
     overflow: hidden;
-    transition: border-radius 0.1s ease;
     backdrop-filter: blur(15px) saturate(1.8);
     -webkit-backdrop-filter: blur(15px) saturate(1.8);
     bottom: 0;
     left: 0;
 }
 
-#my-flights-body {
-    margin: 75vh 0 0;
-    right: 0;
-    height: 100vh;
-    width: 100%;
-}
-
 #main-container {
+    border-radius: 10px 10px 0 0;
     width: 320px;
     height: calc(100vh - 10px)!important;
     margin: calc(100vh - 65px) 0 0 10px;
@@ -129,11 +126,6 @@ body {
 }
 
 #pfp {
-    margin-top: 5px;
-    right: 15px;
-    position: absolute;
-    width: 34px;
-    height: 34px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -145,6 +137,14 @@ body {
     visibility: visible;
     opacity: 1;
     transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+#main-container-main-view #pfp {
+    margin-top: 5px;
+    right: 15px;
+    position: absolute;
+    width: 34px;
+    height: 34px;
 }
 
 #pfp.hidden, #aircraft-list-clear.hidden {
@@ -169,7 +169,7 @@ body {
 
 #aircraft-list-clear {
     height: 18px;
-    aspect-ratio: 1;
+    width: 18px;
     border-radius: 50%;
     position: absolute;
     right: 23px;
@@ -547,6 +547,56 @@ a:hover {
     transition: stroke-dashoffset 0.1s ease;
 }
 
+#my-flights-body {
+    margin: 75vh 0 0;
+    right: 0;
+    height: auto;
+    width: 100%;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#my-flights-body #pfp {
+    width: 48px;
+    height: 48px;
+    margin-top: 4px;
+    position: absolute;
+}
+
+.my-flights-container {
+    display: flex;
+    justify-content: center;
+    height: 500px;
+    width: 75%;
+    margin: 10px;
+}
+
+.my-flights-content-box {
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(10px);
+    margin: 10px;
+    flex: 1;
+    height: 100%;
+    background-color: var(--hover-colour);
+    border-radius: 10px;
+}
+
+.my-flights-pre-title {
+    font-size: 16px;
+    color: grey;
+    margin-left: 60px;
+}
+
+.my-flights-title {
+    font-size: 30px;
+    font-weight: bold;
+    width: calc(75% - 20px);
+    margin-left: 60px;
+}
+
 @supports(padding: max(0px)) {
     #main-container {
         margin-left: max(10px, env(safe-area-inset-left));
@@ -555,6 +605,10 @@ a:hover {
 
 
 @media (max-width: 500px) {
+    #my-flights-body {
+        border-radius: 10px 10px 0 0;
+    }
+
     #main-container {
         right: 10px;
         width: 100vw;

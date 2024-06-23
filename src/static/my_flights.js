@@ -1,7 +1,8 @@
 // static/my_flights.js
 
 document.addEventListener("DOMContentLoaded", function() {
-    let polylines = null;
+    let flightAmount = 0;
+    let polylines;
 
     const socket = io();
     socket.on('disconnect', function() {
@@ -90,6 +91,21 @@ document.addEventListener("DOMContentLoaded", function() {
     const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
     setTheme("satellite")
 
+    // MARK: - Flights
+
+    function animateNumber(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.textContent = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
     const demoFlights = [
                           ['EGLL', 'SIN'],
                           ['SIN', 'SYD'],
@@ -102,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
                           ['EGLL', 'HND'],
                           ['NRT', 'SYD'],
                           ['YSSY', 'PER']
-                         ];
+                        ];
 
     demoFlights.forEach(function(airports) {
         socket.emit('lookup.airportpair', airports[0], airports[1]);
@@ -110,5 +126,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.on('lookup.airportpair', function(airport1, airport2) {
         plotGreatCircleRoute(airport1, airport2);
+        flightAmount++
+//        document.getElementById('my-flights-count').textContent = flightAmount;
+
+        [airport1, airport2].forEach(function(airport) {
+            L.marker([airport.lat, airport.lng], {
+                icon: L.divIcon({
+                    className: 'my-flights-airport-icon',
+                    iconSize: [8, 8]
+                })
+            }).addTo(map);
+        });
     });
+    animateNumber(document.getElementById('my-flights-count'), 0, 3, 1000);
 });

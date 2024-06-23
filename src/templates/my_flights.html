@@ -18,32 +18,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
     <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
     <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)"/>
-
-    <!-- theme coloured things -->
-    <style>
-        :root {
-            accent-color: {{ colour }};
-        }
-
-        #flight-progress::-webkit-progress-value {
-            background-color: {{ colour }};
-        }
-
-        #flight-progress::-moz-progress-bar {
-            background-color: {{ colour }};
-        }
-
-        #flight-progress::after {
-            background-color: {{ colour }};
-        }
-
-        .metre-progress {
-            stroke: {{ colour }};
-        }
-    </style>
 </head>
 <body>
     <div id="map"></div>
-    <div id="my-flights-body"><h1>My Flights</h1></div>
+    <div id="my-flights-body">
+        <div style="width: calc(75% - 20px)">
+            <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
+            <div class="my-flights-pre-title">{{ name }}</div>
+            <div class="my-flights-title"><span id="my-flights-count"></span> flights</div>
+        </div>
+        <div class="my-flights-container">
+            <div class="my-flights-content-box"></div>
+        </div>
+        <div class="my-flights-container">
+            <div class="my-flights-content-box"></div>
+            <div class="my-flights-content-box"></div>
+        </div>
+        <div class="my-flights-container">
+            <div class="my-flights-content-box"></div>
+            <div class="my-flights-content-box"></div>
+        </div>
+
+    </div>
 </body>
 </html>
