@@ -60,15 +60,6 @@ body {
     filter: opacity(50%) var(--map-filters);
 }
 
-.my-flights-airport-icon {
-    height: 100%;
-    width: 100%;
-    outline: solid #FF9500 2px;
-    border-radius: 50%;
-    background-color: white;
-    cursor: pointer;
-}
-
 .aircraft-icon {
     display: flex;
     justify-content: center;
@@ -208,7 +199,7 @@ body {
 }
 
 #aircraft-list > div::before, #aircraft-list-count::before, #aircraft-list-count::after {
-    content: '';
+    content: "";
     position: absolute;
     right: 0;
     height: 0.5px;
@@ -482,7 +473,7 @@ hr {
 }
 
 #flight-progress::before {
-    content: '';
+    content: "";
     display: block;
     width: 100%;
     height: 100%;
@@ -494,7 +485,7 @@ hr {
 }
 
 #flight-progress::after {
-    content: '';
+    content: "";
     display: block;
     height: 100%;
     border-radius: 3px;
@@ -595,6 +586,36 @@ a:hover {
     font-weight: bold;
     width: calc(75% - 20px);
     margin-left: 60px;
+}
+
+.my-flights-airport-icon {
+
+}
+
+.my-flights-airport-icon div {
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background-color: #FF9500;
+    cursor: pointer;
+}
+
+.my-flights-airport-icon div::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
+    border-radius: 50%;
+    background-color: white;
+    transition: width 0.1s ease, height 0.1s ease;
+}
+
+.my-flights-airport-icon div:hover::after {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
 }
 
 @supports(padding: max(0px)) {

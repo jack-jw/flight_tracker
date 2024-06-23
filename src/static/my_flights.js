@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let polylines;
 
     const socket = io();
+    socket.emit('my_flights.get')
     socket.on('disconnect', function() {
         location.reload();
     });
@@ -106,37 +107,23 @@ document.addEventListener("DOMContentLoaded", function() {
         window.requestAnimationFrame(step);
     }
 
-    const demoFlights = [
-                          ['EGLL', 'SIN'],
-                          ['SIN', 'SYD'],
-                          ['SYD', 'HKG'],
-                          ['EGLL', 'HKG'],
-                          ['LHR', 'KSFO'],
-                          ['LHR', 'IAD'],
-                          ['YSSY', 'NAN'],
-                          ['EGLL', 'BER'],
-                          ['EGLL', 'HND'],
-                          ['NRT', 'SYD'],
-                          ['YSSY', 'PER']
-                        ];
+    socket.on('my_flights.get', function(payload) {
 
-    demoFlights.forEach(function(airports) {
-        socket.emit('lookup.airportpair', airports[0], airports[1]);
-    });
+        payload.flights.forEach(function(flight) {
+            plotGreatCircleRoute(payload.airports[flight.origin], payload.airports[flight.destination]);
+        });
 
-    socket.on('lookup.airportpair', function(airport1, airport2) {
-        plotGreatCircleRoute(airport1, airport2);
-        flightAmount++
-//        document.getElementById('my-flights-count').textContent = flightAmount;
-
-        [airport1, airport2].forEach(function(airport) {
+        Object.values(payload.airports).forEach(function(airport) {
             L.marker([airport.lat, airport.lng], {
-                icon: L.divIcon({
+                    icon: L.divIcon({
                     className: 'my-flights-airport-icon',
-                    iconSize: [8, 8]
+                    html: '<div></div>',
+                    iconSize: [14, 14]
                 })
             }).addTo(map);
         });
+
+        animateNumber(document.getElementById('my-flights-count'), 0, payload.count, 1000);
     });
-    animateNumber(document.getElementById('my-flights-count'), 0, 3, 1000);
+
 });

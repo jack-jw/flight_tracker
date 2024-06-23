@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let selection = info = polylines = null;
 
     const socket = io();
+    socket.emit('decoder.get')
     socket.on('disconnect', function() {
         location.reload();
     });

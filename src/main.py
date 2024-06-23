@@ -12,13 +12,14 @@ from os.path import exists
 from base64 import b64decode
 from threading import Thread
 from random import shuffle
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from flask_socketio import SocketIO, emit
 
 from paths import INSTANCE_IMAGES, LOCAL_IMAGES
 import lookup
 import jetphotos
 import openskies
+import my_flights
 
 nato = {
     "0": "ZERO",
@@ -98,35 +99,29 @@ def start():
     def serve_icon(icontype):
         return send_from_directory("static/aircraft", icontype)
 
-    @socketio.on("connect")
-    def handle_connect():
+    @socketio.on("decoder.get")
+    def handle_decoder_get():
         aircraft_list = list(aircraft.items())
         shuffle(aircraft_list)
         shuffled_aircraft = dict(aircraft_list[:750])
         emit("decoder.get", shuffled_aircraft)
 
     @socketio.on("lookup.airport")
-    def handle_airport_info_query(code, routing=None):
+    def handle_lookup_airport(code, routing=None):
         airport = lookup.airport(code)
         airport["routing"] = routing
         emit("lookup.airport", airport)
 
-    @socketio.on("lookup.airportpair")
-    def handle_airport_info_query(code1, code2):
-        airport1 = lookup.airport(code1)
-        airport2 = lookup.airport(code2)
-        emit("lookup.airportpair", (airport1, airport2))
-
     @socketio.on("lookup.add_origin")
-    def handle_add_origin(callsign, origin):
+    def handle_lookup_add_origin(callsign, origin):
         lookup.add_origin(callsign, origin)
 
     @socketio.on("lookup.add_destination")
-    def handle_add_destination(callsign, destination):
+    def handle_lookup_add_destination(callsign, destination):
         lookup.add_destination(callsign, destination)
 
     @socketio.on("lookup.all")
-    def handle_all_info_query(aircraft_address, callsign):
+    def handle_lookup_all(aircraft_address, callsign):
         info = {}
         info["airline"] = lookup.airline(callsign)
         info["aircraft"] = lookup.aircraft(aircraft_address)
@@ -162,6 +157,10 @@ def start():
             info["origin"] = info["destination"] = None
 
         emit("lookup.all", info)
+
+    @socketio.on("my_flights.get")
+    def handle_my_flights_get():
+        emit("my_flights.get", my_flights.get())
 
     socket_thread = Thread(target=socketio.run, args=(app, "0.0.0.0", 5003))
     socket_thread.start()
