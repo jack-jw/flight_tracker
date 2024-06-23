@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // MARK: - Container
 
     const container = document.getElementById("main-container");
-    const minContainerHeight = 80;
+    const minContainerHeight = 65;
 
     container.addEventListener("wheel", resizeContainer);
     container.addEventListener("touchstart", touchStartResizeContainer);
@@ -256,31 +256,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function setTheme(themeName) {
         let tileLayerURL;
+        let credit;
         switch (themeName) {
                 case 'standard':
                     tileLayerURL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © Humanitarian OpenStreetMap Team (HOT)';
                     document.querySelector('.leaflet-tile-pane').style.filter = null;
                     break;
                 case 'osm':
                     tileLayerURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                    credit = 'Map data © OpenStreetMap contributors'
                     document.querySelector('.leaflet-tile-pane').style.filter = null;
                     break;
                 case 'watercolour':
                     tileLayerURL = 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg';
+                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © Stamen Design';
                     document.querySelector('.leaflet-tile-pane').style.filter = 'none';
                     break;
                 case 'satellite':
                     tileLayerURL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+                    credit = 'Map data © Esri, World Imagery'
                     document.querySelector('.leaflet-tile-pane').style.filter = 'none';
                     break;
                 case 'atc':
                     tileLayerURL = 'https://data2.geo-fs.com/osm/{z}/{x}/{y}.png'
+                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © GeoFS'
                     document.querySelector('.leaflet-tile-pane').style.filter = null;
                     break;
                 default:
                     return;
         }
         tileLayer.setUrl(tileLayerURL);
+        document.getElementById('aircraft-list-map-credit').innerHTML = credit;
     }
 
     // MARK: Map definition
@@ -293,7 +300,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-    document.querySelector('.leaflet-tile-pane').style.filter = 'none';
+    setTheme("satellite")
 
     map.on('click', function() {
         if (window.innerWidth <= 500) {
@@ -302,6 +309,38 @@ document.addEventListener("DOMContentLoaded", function() {
             container.style.borderRadius = null;
         }
         clearMap()
+    });
+
+    document.getElementById('aircraft-list-clear').addEventListener('click', function() {
+        document.getElementById('aircraft-list-filter').value = '';
+        document.getElementById('aircraft-list-filter').dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    document.getElementById('aircraft-list-filter').addEventListener('input', function() {
+        const filterValue = this.value.toUpperCase();
+        if (filterValue !== "") {
+            document.getElementById('aircraft-list-filter').style.width = "calc(100% - 45px)"
+            document.getElementById('pfp').classList.add("hidden");
+            document.getElementById('aircraft-list-clear').classList.remove("hidden");
+        } else {
+            document.getElementById('aircraft-list-filter').style.width = null;
+            document.getElementById('aircraft-list-clear').classList.add("hidden");
+            document.getElementById('pfp').classList.remove("hidden");
+        }
+
+        const aircraftList = document.getElementById('aircraft-list').children;
+        Array.from(aircraftList).forEach(item => {
+            if (item.tagName === "DIV") {
+                const callsign = item.querySelector('.aircraft-list-callsign').textContent;
+                if (callsign.includes(filterValue)) {
+                    item.style.display = null
+                } else {
+                    item.style.display = "none"
+                }
+            }
+        });
+
+        setMaxContainerHeight()
     });
 
     // MARK: - Aircraft
@@ -343,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function() {
             setAircraft(individual);
 
             const listItem = document.createElement('div');
-            listItem.setAttribute('class', `_${individual.icao24}`);
+            listItem.classList.add(`_${individual.icao24}`);
             listItem.innerHTML = `
                 <div class="aircraft-list-airline-logo" style="background-image: url(https://www.flightaware.com/images/airline_logos/180px/${individual.callsign.slice(0,3)}.png)">
                 </div>
@@ -365,6 +404,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const countElement = document.createElement('footer');
+        countElement.setAttribute('id', 'aircraft-list-count')
         countElement.innerHTML = `${aircraftCount} aircraft`;
         aircraftList.appendChild(countElement);
 
@@ -372,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('lookup.all', function(response) {
-        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder"
+        document.getElementById('aircraft-img').style.display = 'none'
         info = response;
 
         const url = new URL(window.location.href);
@@ -457,6 +497,7 @@ document.addEventListener("DOMContentLoaded", function() {
         container.style.borderRadius = null;
         setMaxContainerHeight()
         document.getElementById('back').addEventListener('click', clearMap);
+        document.getElementById('aircraft-img').style.display = null;
         aircraftView.style.display = null;
     });
 

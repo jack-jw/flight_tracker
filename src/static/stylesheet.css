@@ -84,7 +84,7 @@ body {
 
 #resize-handle {
     margin-top: 5px;
-    width: 50px;
+    width: 36px;
     height: 5px;
     margin-left: auto;
     margin-right: auto;
@@ -114,37 +114,111 @@ body {
     padding: 0 15px;
 }
 
-#main-container-main-view h1 {
-    margin-top: 10px;
-    float: left;
-}
-
-#main-container #pfp {
-    margin-top: 10px;
-    float: right;
-}
-
 #pfp {
-    width: 38px;
-    height: 38px;
+    margin-top: 5px;
+    right: 15px;
+    position: absolute;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: rgba(255, 255, 255, 0.75);
     font-weight: bold;
-    font-size: 25px;
+    font-size: 22px;
     cursor: pointer;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
 }
 
-#aircraft-list > div, #aircraft-list footer {
-    border-top: 0.1px solid var(--control-colour);
+#pfp.hidden, #aircraft-list-clear.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#aircraft-list-filter {
+    color: var(--colour);
+    background-color: var(--hover-colour);
+    border: 0;
+    outline: 0;
+    height: 34px;
+    margin: 5px 0 15px;
+    width: calc(100% - 90px);
+    font-size: 16px;
+    padding: 0 8px;
+    border-radius: 10px;
+    position: absolute;
+    transition: width 0.25s ease;
+}
+
+#aircraft-list-clear {
+    height: 18px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    position: absolute;
+    right: 23px;
+    top: 23px;
+    color: var(--background-colour);
+    background-color: var(--control-colour);
+    font-size: 18px;
+    cursor: pointer;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+    z-index: 2;
+}
+
+#aircraft-list-clear::before {
+    content: "×";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -1px;
+}
+
+#aircraft-list-clear:active {
+    opacity: 0.5;
+}
+
+#aircraft-list {
+    margin-top: 50px;
+}
+
+#aircraft-list > div, #aircraft-list-count {
+    position: relative;
+}
+
+#aircraft-list > div::before, #aircraft-list-count::before, #aircraft-list-count::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    height: 0.5px;
+    background-color: var(--control-colour);
+}
+
+#aircraft-list > div::before, #aircraft-list-count::before {
+    top: 0;
+}
+
+#aircraft-list > div::before {
+    width: calc(100% - 80px);
+}
+
+#aircraft-list-count::before, #aircraft-list-count::after {
+    width: 100%;
+}
+
+#aircraft-list-count::after {
+    bottom: 0;
 }
 
 #aircraft-list > div {
     transition: background-color 0.1s ease, border-top 0.1s ease;
     cursor: pointer;
-    height: 75px;
+    height: 80px;
     display: flex;
     align-items: center;
 }
@@ -152,16 +226,24 @@ body {
 #aircraft-list > div:hover {
     background-color: var(--hover-colour);
     border-radius: 10px;
-    border-top: 0.1px solid transparent;
 }
 
-#aircraft-list > div:hover + div, #aircraft-list > div:hover + footer, #aircraft-list > div:active + div, #aircraft-list > div:active + footer {
-    border-top: 0.1px solid transparent;
+#aircraft-list > div:hover::before,
+#aircraft-list > div:hover + div::before,
+#aircraft-list > div:hover + #aircraft-list-count::before,
+#aircraft-list > div:active::before,
+#aircraft-list > div:active + div::before,
+#aircraft-list > div:active + #aircraft-list-count::before {
+    display: none;
 }
 
 #aircraft-list > div:active {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
+}
+
+#aircraft-list > :first-child::before {
+    display: none;
 }
 
 .aircraft-list-airline-logo {
@@ -184,18 +266,25 @@ body {
 .aircraft-list-callsign {
     font-weight: bold;
     font-size: 18px;
-
 }
 
 .aircraft-list-metrics {
     color: grey;
+    font-size: 15px;
 }
 
-#aircraft-list footer {
-    color: var(--control-colour);
+#aircraft-list-count {
     text-align: center;
+    font-size: 16px;
     padding: 10px;
-    border-bottom: 0.1px solid var(--control-colour);
+    color: grey;
+}
+
+#aircraft-list-credits {
+    color: grey;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 25px;
 }
 
 #aircraft-airline-callsign {
@@ -277,7 +366,6 @@ body {
     background-color: var(--hover-colour);
     padding: 0 !important;
     margin: 0 !important;
-    margin-bottom: 180px!important;
     pointer-events: none;
     z-index: -1;
     position: relative;
@@ -305,7 +393,6 @@ hr {
     position: absolute;
     width: 100px;
     background-color: var(--hover-colour);
-    box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     text-transform: uppercase;
     cursor: pointer;
@@ -321,14 +408,12 @@ hr {
     cursor: text;
     background-color: inherit;
     padding: 1px 0;
-    box-shadow: none;
 }
 
 .iata-input:focus {
     cursor: text;
     background-color: var(--hover-colour);
     padding: 1px 5px;
-    box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);
 }
 
 .iata-input::placeholder {
@@ -362,7 +447,7 @@ hr {
     -webkit-appearance: none;
     appearance: none;
     height: 6px;
-    border-radius: 3.75px;
+    border-radius: 3px;
     overflow: hidden;
 }
 
@@ -489,5 +574,22 @@ a:hover {
         height: 32px;
         margin: 10px;
         font-size: 20px;
+    }
+
+    #main-container-main-view #pfp {
+        width: 36px;
+        height: 36px;
+        font-size: 24px;
+    }
+
+    #aircraft-list-filter {
+        height: 36px;
+        width: calc(100% - 92px);
+        font-size: 18px;
+        padding: 0 8px;
+    }
+
+    #aircraft-list-clear {
+        top: 24px;
     }
 }

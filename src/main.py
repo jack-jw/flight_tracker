@@ -65,7 +65,7 @@ def start():
     """
 
     # will be replaced by the actual decoder later
-    aircraft = openskies.load("../os.json", num_only=False)
+    aircraft = openskies.load("../os.json", num_only=True)
 
     app = Flask("flight_tracker")
     app.config["SECRET_KEY"] = urandom(24)

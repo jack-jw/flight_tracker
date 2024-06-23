@@ -10,17 +10,18 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * ~~Add aircraft~~
         * ~~Make aircraft animate across the map even without being updated~~
             * Fix animations bugging over time - is this just because there are a lot of aircraft in the OS API JSON?
-        * Add special icons for aircraft (by type)
+        * ~~Add special icons for aircraft (by type)~~
         * Make it so more than 500 aircraft can be on the map at once - server or client side selection of aircraft?
         * Add UI to import from openskies, not just locally?
         * State saving - JSONs or through the web interface?
     * Aircraft list/sidebar
         * ~~Add callsigns and metrics~~
         * ~~Add airline logos from FlightAware~~
-        * Reorganise (airline logos too big?)
+        * ~~Reorganise (airline logos too big?)~~
+        * Change metrics shown?
         * Optimise and fix buggy scrolling on mobile
     * Flight detail view
-        * Fix horrendous implementation in JS
+        * ~~Fix horrendous implementation in JS~~
         * ~~Callsign~~
             * ~~Radio callsign in tooltip~~
                 * Not visible in mobile! find workaround!
@@ -50,8 +51,8 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * ~~Implement dark mode~~
             * ~~Make dark mode for the OSM map by inverting and then rotating the hue~~
         * ~~Use Inter and self made plane icon instead of SF for open source and consistency~~
-        * New favicon - add stuff for iOS web apps?
-        * Design special icons (as mentioned)
+        * New favicon - ~~add stuff for iOS web apps?~~
+        * ~~Design special icons (as mentioned)~~
     * Implementation of weather info? Possible without cost?
 * Database management
     * ~~Basic functions (downloading, converting to SQLite, accessing)~~

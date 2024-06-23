@@ -3,7 +3,7 @@
 
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -11,12 +11,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
 
     <script src="{{ url_for('static', filename='map.js') }}"></script>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='bg-icon.jpeg') }}">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='bg-icon.jpeg') }}"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
-    <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)">
-        <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
+        <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)"/>
 
     <!-- theme coloured things -->
     <style>
@@ -48,7 +48,7 @@
         <div id="main-container-aircraft-view" style="display: none;">
             <div id="back">&larr;</div>
             <div id="info">i</div>
-            <div id="aircraft-img-shadow"><img id="aircraft-img"></div>
+            <div id="aircraft-img-shadow"><img id="aircraft-img"/></div>
 
             <div id="aircraft-info">
                 <div id="aircraft-airline-callsign">
@@ -69,7 +69,7 @@
 
                     <input id="destination-input" class="iata-input" style="text-align: right; right: 0" contenteditable="true" maxlength="3" minlength="3" required/>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" id="iata-inputs-plane" viewBox="0 0 115 120">
+                    <svg id="iata-inputs-plane" viewBox="0 0 115 120">
                         <path d="M94.72,43.45s-13.43,0-23.65,0c-1.01,0-1.97-.46-2.59-1.26L36.39,1.57c-2.83-3.58-8.5-.47-7,3.84l13.43,38.55c-11.42.57-22.8,1.48-29.9,2.11l-6.13-14.08C5.26,28.47,0,29.56,0,33.41v42.27c0,3.84,5.26,4.94,6.79,1.41l6.13-14.09c7.13.62,18.55,1.54,29.9,2.11l-13.44,38.56c-1.5,4.31,4.17,7.43,7,3.84l32.09-40.63c.63-.79,1.58-1.26,2.59-1.26,10.23,0,23.65,0,23.65,0,0,0,18.66.02,18.66-11.09s-18.66-11.09-18.66-11.09Z"/>
                     </svg>
                 </div>
@@ -111,15 +111,17 @@
 
         <div id="main-container-main-view">
             <div id="resize-handle"></div>
-            <h1>Aircraft</h1>
+
             <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
-            <div id="aircraft-list" style="clear: left;"></div>
-            <footer id="credits" style="opacity: 50%; text-align: center; margin-top: 25px; font-size: 12px;"</div>
-                Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet <span class="fi fis fi-ua"></span></a>
+            <input id="aircraft-list-filter" placeholder="Filter Callsigns">
+            <div id="aircraft-list-clear" class="hidden"></div>
+            <div id="aircraft-list"></div>
+            <footer id="aircraft-list-credits">
+                Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet 🇺🇦</a>
                 <br>
-                Map data © <a target="_blank" href="https://www.openstreetmap.org/copyright" id="map-data-credit">OpenStreetMap</a>
+                <span id="aircraft-list-map-credit"></span>
                 <br><br>
-                <a target="_blank" href="about:blank" id="map-data-credit">All acknowledgements &nearr;</a>
+                <a target="_blank" href="about:blank" id="aircraft-list-all-credit">All acknowledgements &nearr;</a>
             </footer>
         </div>
     </div>
