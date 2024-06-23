@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- templates/my_flights.html -->
+
+<html lang="en">
+<head>
+    <title>My Flights</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+
+    <script src="{{ url_for('static', filename='my_flights.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='bg-icon.jpeg') }}"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
+    <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)"/>
+
+    <!-- theme coloured things -->
+    <style>
+        :root {
+            accent-color: {{ colour }};
+        }
+
+        #flight-progress::-webkit-progress-value {
+            background-color: {{ colour }};
+        }
+
+        #flight-progress::-moz-progress-bar {
+            background-color: {{ colour }};
+        }
+
+        #flight-progress::after {
+            background-color: {{ colour }};
+        }
+
+        .metre-progress {
+            stroke: {{ colour }};
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="my-flights-body"><h1>My Flights</h1></div>
+</body>
+</html>

@@ -72,8 +72,12 @@ def start():
     socketio = SocketIO(app)
 
     @app.route("/")
-    def index():
+    def serve_map():
         return render_template("map.html", initial=getlogin()[:1].upper(), colour="#3478F6")
+
+    @app.route("/my")
+    def serve_my_flights():
+        return render_template("my_flights.html", initial=getlogin()[:1].upper(), colour="#3478F6")
 
     @app.route("/image/aircraft/<tail>")
     def serve_aircraft_image(tail):
@@ -106,6 +110,12 @@ def start():
         airport = lookup.airport(code)
         airport["routing"] = routing
         emit("lookup.airport", airport)
+
+    @socketio.on("lookup.airportpair")
+    def handle_airport_info_query(code1, code2):
+        airport1 = lookup.airport(code1)
+        airport2 = lookup.airport(code2)
+        emit("lookup.airportpair", (airport1, airport2))
 
     @socketio.on("lookup.add_origin")
     def handle_add_origin(callsign, origin):

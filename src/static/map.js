@@ -19,99 +19,22 @@ document.addEventListener("DOMContentLoaded", function() {
     // MARK: - Container
 
     const container = document.getElementById("main-container");
-    const minContainerHeight = 65;
 
-    container.addEventListener("wheel", resizeContainer);
-    container.addEventListener("touchstart", touchStartResizeContainer);
-    container.addEventListener("touchmove", touchResizeContainer);
-    container.addEventListener("touchend", touchEndResizeContainer);
-
-    function setMaxContainerHeight() {
-        const elements = container.children;
-        maxContainerHeight = 60
-        for (let i = 0; i < elements.length; i++) {
-            if (window.getComputedStyle(elements[i]).display !== 'none') {
-                maxContainerHeight += elements[i].offsetHeight;
-            }
-        }
-
-        if (maxContainerHeight < window.innerHeight) {
-            if (window.innerWidth > 500) {
-                maxContainerHeight = window.innerHeight - 10;
-            } else {
-                maxContainerHeight = window.innerHeight;
-            }
-        }
-
-        if (window.getComputedStyle(container).height > maxContainerHeight) {
-            container.style.height = maxContainerHeight + "px";
-            setContainerRadius()
-        }
-    }
-
-    window.addEventListener('resize', setMaxContainerHeight);
-    setMaxContainerHeight();
-
-    function setContainerRadius() {
-        if (container.clientHeight >= window.innerHeight) {
-            container.style.borderRadius = '0';
+    function setContainerDefaultScroll(scrollBehaviour) {
+        let scrollPosition;
+        if (window.innerWidth > 500) {
+            scrollPosition = document.body.scrollHeight;
         } else {
-            container.style.borderRadius = null;
+            scrollPosition = containerPosition - (window.innerHeight - 370);
         }
-    }
 
-    function resizeContainer(e) {
-        container.style.transition = null;
-        const newHeight = container.clientHeight + e.deltaY;
-        if (newHeight >= minContainerHeight && newHeight <= maxContainerHeight) {
-            container.style.height = newHeight + "px";
-        } else if (newHeight < minContainerHeight) {
-            container.style.height = minContainerHeight + "px";
-        } else if (newHeight > maxContainerHeight) {
-            container.style.height = maxContainerHeight + "px";
-        }
-        e.preventDefault();
-        setContainerRadius();
+        window.scrollTo({
+            top: scrollPosition,
+            left: 0,
+            behavior: scrollBehaviour
+        });
     }
-
-    function touchStartResizeContainer(e) {
-        container.style.transition = null;
-        startY = e.touches[0].clientY;
-        startHeight = container.clientHeight;
-        containerMomentum = 0;
-    }
-    function touchResizeContainer(e) {
-        if (!startY) {
-            return;
-        }
-        const changeInY = startY - e.touches[0].clientY;
-        containerMomentum = changeInY * 0.2; // 0.2 is scroll multiplier
-        const newHeight = startHeight + changeInY;
-        if (newHeight >= minContainerHeight && newHeight <= maxContainerHeight) {
-            container.style.height = newHeight + "px";
-        } else if (newHeight < minContainerHeight) {
-            container.style.height = minContainerHeight + "px";
-        } else if (newHeight > maxContainerHeight) {
-            container.style.height = maxContainerHeight + "px";
-        }
-        e.preventDefault();
-        setContainerRadius();
-    }
-    function touchEndResizeContainer() {
-        startY = startHeight = null;
-        if (containerMomentum !== 0) {
-            const interval = setInterval(function() {
-                const newHeight = container.clientHeight + containerMomentum;
-                if (newHeight >= minContainerHeight && newHeight <= maxContainerHeight) {
-                    container.style.height = newHeight + "px";
-                    containerMomentum *= 0.9; // 0.9 is decay rate
-                } else {
-                    clearInterval(interval);
-                }
-            }, 32);
-        }
-        setContainerRadius()
-    }
+    setContainerDefaultScroll('instant')
 
     // MARK: - Map
 
@@ -141,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
         selection = info = polylines = null;
         document.getElementById('main-container-main-view').style.display = null;
         document.getElementById('main-container-aircraft-view').style.display = "none";
-        setMaxContainerHeight();
     }
 
     function setAircraft(anAircraft) {
@@ -184,13 +106,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const point = map.latLngToContainerPoint(latlng);
         let xOffset = yOffset = 0;
 
-        container.style.transition = 'height 0.3s ease';
         if (window.innerWidth > 500) {
-            container.style.height = (window.innerHeight - 10) + "px";
             xOffset = -160;
         } else {
-            container.style.height = "335px";
-            yOffset = 160;
+            yOffset = 180;
         }
         point.x += xOffset;
         point.y += yOffset;
@@ -304,9 +223,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     map.on('click', function() {
         if (window.innerWidth <= 500) {
-            container.style.transition = 'height 0.3s ease';
-            container.style.height = minContainerHeight + "px";
-            container.style.borderRadius = null;
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
         }
         clearMap()
     });
@@ -318,29 +239,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById('aircraft-list-filter').addEventListener('input', function() {
         const filterValue = this.value.toUpperCase();
-        if (filterValue !== "") {
-            document.getElementById('aircraft-list-filter').style.width = "calc(100% - 45px)"
-            document.getElementById('pfp').classList.add("hidden");
-            document.getElementById('aircraft-list-clear').classList.remove("hidden");
+        if (filterValue !== '') {
+            document.getElementById('aircraft-list-filter').style.width = 'calc(100% - 45px)'
+            document.getElementById('pfp').classList.add('hidden');
+            document.getElementById('aircraft-list-clear').classList.remove('hidden');
         } else {
             document.getElementById('aircraft-list-filter').style.width = null;
-            document.getElementById('aircraft-list-clear').classList.add("hidden");
-            document.getElementById('pfp').classList.remove("hidden");
+            document.getElementById('aircraft-list-clear').classList.add('hidden');
+            document.getElementById('pfp').classList.remove('hidden');
         }
 
         const aircraftList = document.getElementById('aircraft-list').children;
         Array.from(aircraftList).forEach(item => {
-            if (item.tagName === "DIV") {
+            if (item.tagName === 'DIV') {
                 const callsign = item.querySelector('.aircraft-list-callsign').textContent;
                 if (callsign.includes(filterValue)) {
-                    item.style.display = null
+                    item.style.display = null;
                 } else {
-                    item.style.display = "none"
+                    item.style.display = 'none';
                 }
+            } else if (filterValue === '') {
+                item.style.display = null;
+            } else {
+                item.style.display = 'none';
             }
         });
-
-        setMaxContainerHeight()
     });
 
     // MARK: - Aircraft
@@ -407,8 +330,6 @@ document.addEventListener("DOMContentLoaded", function() {
         countElement.setAttribute('id', 'aircraft-list-count')
         countElement.innerHTML = `${aircraftCount} aircraft`;
         aircraftList.appendChild(countElement);
-
-        setMaxContainerHeight();
     });
 
     socket.on('lookup.all', function(response) {
@@ -494,8 +415,7 @@ document.addEventListener("DOMContentLoaded", function() {
         plotRoutes();
         centreOnSelection();
 
-        container.style.borderRadius = null;
-        setMaxContainerHeight()
+        setContainerDefaultScroll('smooth');
         document.getElementById('back').addEventListener('click', clearMap);
         document.getElementById('aircraft-img').style.display = null;
         aircraftView.style.display = null;
