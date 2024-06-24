@@ -71,7 +71,8 @@ def _get_airlines_table():
         cols = row.find_all("td")
         data = [col.get_text(strip=True) for col in cols]
         data += [None] * (6 - len(data))
-        cursor.execute("INSERT INTO airlines VALUES (?, ?, ?, ?, ?)", data[:5])
+        if data[5] is None or "defunct" not in data[5].lower():
+            cursor.execute("INSERT INTO airlines VALUES (?, ?, ?, ?, ?)", data[:5])
 
     cursor.close()
     main_db.commit()

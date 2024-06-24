@@ -115,10 +115,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         Object.values(payload.airports).forEach(function(airport) {
             const tooltipContent = `
-                <span>${airport.iata}</span>
-                <b style="margin-right: 1.75em;">${airport.name}</b>
-                <span style="position: absolute; right: 0.75em;" class="fi fis fi-${airport.country.toLowerCase()}"></span><br>
-                ${airport.visits} visit${airport.visits > 1 ? 's' : ''}
+                <div class="my-flights-airport-tooltip-title">
+                    <span class="fi fis fi-${airport.country.toLowerCase()}"></span>
+                    <span class="my-flights-airport-tooltip-iata">${airport.iata}</span>
+                    <span class="my-flights-airport-tooltip-name">${airport.name}</span>
+                </div>
+                <div class="my-flights-airport-tooltip-visits">${airport.visits} visit${airport.visits > 1 ? 's' : ''}</div>
             `;
 
             L.marker([airport.lat, airport.lng], {
@@ -127,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     html: '<div></div>',
                     iconSize: [airport.size, airport.size]
                 })
-            }).addTo(map).bindTooltip(tooltipContent);
+            }).addTo(map).setZIndexOffset(airport.visits).bindTooltip(tooltipContent, { className: 'my-flights-airport-tooltip' });
         });
 
         animateNumber(document.getElementById('my-flights-count'), 0, payload.count, 1000);

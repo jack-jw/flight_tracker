@@ -273,13 +273,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let aircraftCount = 0;
     const aircraftList = document.getElementById('aircraft-list');
 
-    // Check if an aircraft is selected in the URL
-    const urlIcao24 = new URLSearchParams(window.location.search).get('icao24');
-    const urlCallsign = new URLSearchParams(window.location.search).get('callsign');
-    if (urlCallsign !== null && urlIcao24 !== null) {
-        socket.emit("lookup.all", urlIcao24, urlCallsign);
-    }
-
     socket.on('decoder.get', function(payload) {
         oldAircraft = { ...aircraft };
         aircraft = {
@@ -333,6 +326,13 @@ document.addEventListener("DOMContentLoaded", function() {
         countElement.innerHTML = `${aircraftCount} aircraft`;
         aircraftList.appendChild(countElement);
     });
+
+    // Check if an aircraft is selected in the URL
+    const urlIcao24 = new URLSearchParams(window.location.search).get('icao24');
+    const urlCallsign = new URLSearchParams(window.location.search).get('callsign');
+    if (urlCallsign !== null && urlIcao24 !== null && urlIcao24 in aircraft) {
+        socket.emit("lookup.all", urlIcao24, urlCallsign);
+    }
 
     socket.on('lookup.all', function(response) {
         document.getElementById('aircraft-img').style.display = 'none'

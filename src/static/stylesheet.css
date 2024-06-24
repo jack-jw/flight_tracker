@@ -619,15 +619,38 @@ a:hover {
     width: calc(100% - 6px);
 }
 
-.leaflet-tooltip {
+.my-flights-airport-tooltip {
     color: var(--colour);
     background-color: var(--background-colour);
     border-radius: 10px;
     border: 0;
-    padding: 6px;
+    padding: 8px 12px;
     font-size: 12px;
     font-family: var(--default-fonts);
     box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.my-flights-airport-tooltip-title {
+    font-size: 14px;
+}
+
+.my-flights-airport-tooltip-iata {
+    margin-left: 1.25em;
+}
+
+.my-flights-airport-tooltip-name {
+    font-weight: bold;
+}
+
+.my-flights-airport-tooltip-title .fis {
+    position: absolute;
+    left: 0.75em;
+    margin-top: 0.25em;
+}
+
+.my-flights-airport-tooltip-visits {
+    font-size: 12px;
+    color: grey;
 }
 
 .leaflet-tooltip-left:before {
@@ -711,6 +734,7 @@ a:hover {
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
         height: 100vh;
         width: 100vw;
         position: fixed;
@@ -720,6 +744,9 @@ a:hover {
         z-index: 1;
         backdrop-filter: blur(10px) saturate(1.8);
         -webkit-backdrop-filter: blur(10px) saturate(1.8);
+    }
+    body {
+        position: fixed!important;
     }
 }
 

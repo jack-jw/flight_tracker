@@ -22,6 +22,7 @@ def get():
         {"origin": "RJAA", "destination": "YSSY"},
         {"origin": "YSSY", "destination": "YPPH"},
         {"origin": "NFFN", "destination": "YSSY"},
+        {"origin": "EGLC", "destination": "LIML"}
     )
     for flight in flights_table:
         flights.append({"origin": flight["origin"], "destination": flight["destination"]})
@@ -50,8 +51,4 @@ def get():
         for airport in airports:
             airports[airport]["size"] = (distributor[0] + distributor[1]) / 2
 
-    print(airport_visit_min, airport_visit_max)
-
     return {"airports": airports, "flights": flights, "count": len(flights)}
-
-print(get())
