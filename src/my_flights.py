@@ -22,7 +22,8 @@ def get():
         {"origin": "RJAA", "destination": "YSSY"},
         {"origin": "YSSY", "destination": "YPPH"},
         {"origin": "NFFN", "destination": "YSSY"},
-        {"origin": "EGLC", "destination": "LIML"}
+        {"origin": "EGLC", "destination": "LIML"},
+        {"origin": "EGLC", "destination": "EDDB"}
     )
     for flight in flights_table:
         flights.append({"origin": flight["origin"], "destination": flight["destination"]})

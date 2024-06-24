@@ -117,8 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const tooltipContent = `
                 <div class="my-flights-airport-tooltip-title">
                     <span class="fi fis fi-${airport.country.toLowerCase()}"></span>
-                    <span class="my-flights-airport-tooltip-iata">${airport.iata}</span>
-                    <span class="my-flights-airport-tooltip-name">${airport.name}</span>
+                    <span class="my-flights-airport-tooltip-iata">${airport.iata}</span> ${airport.name}
                 </div>
                 <div class="my-flights-airport-tooltip-visits">${airport.visits} visit${airport.visits > 1 ? 's' : ''}</div>
             `;
