@@ -1,6 +1,6 @@
 // static/my_flights.js
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', function() {
     let flightAmount = 0;
     let polylines;
 
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-    setTheme("satellite")
+    setTheme('satellite')
 
     // MARK: - Flights
 
@@ -119,19 +119,44 @@ document.addEventListener("DOMContentLoaded", function() {
                     <span class="fi fis fi-${airport.country.toLowerCase()}"></span>
                     <span class="my-flights-airport-tooltip-iata">${airport.iata}</span> ${airport.name}
                 </div>
-                <div class="my-flights-airport-tooltip-visits">${airport.visits} visit${airport.visits > 1 ? 's' : ''}</div>
+                <div class="my-flights-airport-tooltip-flights">${airport.flights} flight${airport.flights > 1 ? 's' : ''}</div>
             `;
 
             L.marker([airport.lat, airport.lng], {
-                    icon: L.divIcon({
-                    className: 'my-flights-airport-icon',
-                    html: '<div></div>',
-                    iconSize: [airport.size, airport.size]
-                })
-            }).addTo(map).setZIndexOffset(airport.visits).bindTooltip(tooltipContent, { className: 'my-flights-airport-tooltip' });
+            icon: L.divIcon({
+            className: 'my-flights-airport-icon',
+            html: '<div></div>',
+            iconSize: [12, 12]
+            })
+            }).addTo(map).setZIndexOffset(airport.flights).bindTooltip(tooltipContent, { className: 'my-flights-airport-tooltip' });
         });
 
-        animateNumber(document.getElementById('my-flights-count'), 0, payload.count, 1000);
+        animateNumber(document.getElementById('my-flights-count'), 0, payload.flights.length, 1000);
+
+        Object.keys(payload.rankings).forEach(function(category) {
+            const baseClass = `my-flights-${category}-`;
+            for (let i = 0; i < payload.rankings[category].length; i++) {
+                const rankItem = document.getElementById(baseClass + i);
+                const rankIcon = rankItem.querySelector('.my-flights-rank-icon');
+                let displayName, imageUrl;
+
+                if (category === 'airlines') {
+                    displayName = payload.airlines[payload.rankings.airlines[i].icao].name;
+                    imageUrl = 'https://www.flightaware.com/images/airline_logos/180px/' + payload.rankings.airlines[i].icao + '.png';
+                } else if (category === 'aircraft') {
+                    displayName = payload.rankings.aircraft[i].icao;
+//                    imageUrl =
+                } else if (category === 'airports') {
+                    displayName = payload.airports[payload.rankings.airports[i].icao].iata;
+                    imageUrl = 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/flags/1x1/' + payload.airports[payload.rankings.airports[i].icao].country.toLowerCase() + '.svg';
+                }
+
+
+                rankItem.querySelector('.my-flights-rank-name').textContent = displayName;
+                rankItem.querySelector('.my-flights-rank-icon').style.backgroundImage = 'url(' + imageUrl + ')';
+            }
+        });
+
     });
 
 });

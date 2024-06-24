@@ -1,55 +1,83 @@
 # my_flights.py
 
 import lookup
+from bisect import bisect_left
+
+def _eval_ranking(addition, ranking):
+    if ranking:
+        ranking_keys = [d["flights"] for d in ranking]
+        rank = bisect_left(ranking_keys, addition["flights"])
+    else:
+        rank = 0
+    ranking.insert(rank, addition)
+    return ranking
 
 def get():
     # flights_table = lookup.get_my_flights_table()
-    flights = []
+    airlines = {}
+    aircraft = {}
     airports = {}
-    airport_visit_min = airport_visit_max = 0
+    flights = []
 
+    # random flights for demo for now
     flights_table = (
-        {"origin": "EGLL", "destination": "WSSS"},
-        {"origin": "WSSS", "destination": "YSSY"},
-        {"origin": "YSSY", "destination": "WSSS"},
-        {"origin": "YSSY", "destination": "VHHH"},
-        {"origin": "EGLL", "destination": "VHHH"},
-        {"origin": "EGLL", "destination": "KSFO"},
-        {"origin": "EGLL", "destination": "KIAD"},
-        {"origin": "YSSY", "destination": "NFFN"},
-        {"origin": "EGLL", "destination": "EDDB"},
-        {"origin": "EGLL", "destination": "RJTT"},
-        {"origin": "RJAA", "destination": "YSSY"},
-        {"origin": "YSSY", "destination": "YPPH"},
-        {"origin": "NFFN", "destination": "YSSY"},
-        {"origin": "EGLC", "destination": "LIML"},
-        {"origin": "EGLC", "destination": "EDDB"}
+        {"origin": "EGLL", "destination": "WSSS", "aircraft": "B789", "callsign": "BAW15"},
+        {"origin": "WSSS", "destination": "YSSY", "aircraft": "B789", "callsign": "BAW15"},
+        {"origin": "YSSY", "destination": "WSSS", "aircraft": "B789", "callsign": "BAW16"},
+        {"origin": "YSSY", "destination": "VHHH", "aircraft": "A35K", "callsign": "CPA100"},
+        {"origin": "VHHH", "destination": "EGLL", "aircraft": "B772", "callsign": "CPA238"},
+        {"origin": "EGLL", "destination": "KSFO", "aircraft": "B772", "callsign": "BAW285"},
+        {"origin": "EGLL", "destination": "KIAD", "aircraft": "B772", "callsign": "BAW293"},
+        {"origin": "NFFN", "destination": "YSSY", "aircraft": "B738", "callsign": "VOZ184"},
+        {"origin": "EDDB", "destination": "EGLL", "aircraft": "A320", "callsign": "BAW995"},
+        {"origin": "RJTT", "destination": "EGLL", "aircraft": "B789", "callsign": "JAL41"},
+        {"origin": "YSSY", "destination": "RJTT", "aircraft": "B789", "callsign": "JAL51"},
+        {"origin": "YSSY", "destination": "YPPH", "aircraft": "A333", "callsign": "QFA641"},
+        {"origin": "NFFN", "destination": "YSSY", "aircraft": "B738", "callsign": "VOZ184"},
+        {"origin": "EGLC", "destination": "EDDB", "aircraft": "E195", "callsign": "CFE7029"}
     )
+
     for flight in flights_table:
         flights.append({"origin": flight["origin"], "destination": flight["destination"]})
 
         for airport in (flight["origin"], flight["destination"]):
             info = lookup.airport(airport)
             if info["icao"] in airports:
-                airports[info["icao"]]["visits"] += 1
+                airports[info["icao"]]["flights"] += 1
             else:
                 airports[info["icao"]] = info
-                airports[info["icao"]]["visits"] = 1
+                airports[info["icao"]]["flights"] = 1
 
-            if airport_visit_max < airports[info["icao"]]["visits"]:
-                airport_visit_max = airports[info["icao"]]["visits"]
+        info = lookup.airline(flight["callsign"][:3])
+        if info["icao"] in airlines:
+            airlines[info["icao"]]["flights"] += 1
+        else:
+            airlines[info["icao"]] = info
+            airlines[info["icao"]]["flights"] = 1
 
-            if airport_visit_min == 0 or airport_visit_min > airports[info["icao"]]["visits"]:
-                airport_visit_min = airports[info["icao"]]["visits"]
+        if flight["aircraft"] in aircraft:
+            aircraft[flight["aircraft"]]["flights"] += 1
+        else:
+            aircraft[flight["aircraft"]] = {"flights": 1, "icao": flight["aircraft"]}
 
-    visit_range = airport_visit_max - airport_visit_min
-    distributor = (10, 16)
+    response = {
+        "airlines": airlines,
+        "aircraft": aircraft,
+        "airports": airports,
+        "flights": flights,
+        "rankings": {
+            "airlines": [],
+            "aircraft": [],
+            "airports": []
+        }
+    }
 
-    if visit_range != 0:
-        for airport in airports:
-            airports[airport]["size"] = distributor[0] + ((airports[airport]["visits"] - airport_visit_min) / visit_range) * (distributor[1] - distributor[0])
-    else:
-        for airport in airports:
-            airports[airport]["size"] = (distributor[0] + distributor[1]) / 2
+    for category in response["rankings"]:
+        for key in response[category]:
+            individual = response[category][key]
+            ranking_entry = {"icao": individual["icao"], "flights": individual["flights"]}
+            response["rankings"][category] = _eval_ranking(ranking_entry, response["rankings"][category])
+        response["rankings"][category].reverse()
+        response["rankings"][category] = response["rankings"][category][:5]
 
-    return {"airports": airports, "flights": flights, "count": len(flights)}
+    return response
