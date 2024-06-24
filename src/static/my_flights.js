@@ -114,13 +114,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         Object.values(payload.airports).forEach(function(airport) {
+            const tooltipContent = `
+                <span>${airport.iata}</span>
+                <b style="margin-right: 1.75em;">${airport.name}</b>
+                <span style="position: absolute; right: 0.75em;" class="fi fis fi-${airport.country.toLowerCase()}"></span><br>
+                ${airport.visits} visit${airport.visits > 1 ? 's' : ''}
+            `;
+
             L.marker([airport.lat, airport.lng], {
                     icon: L.divIcon({
                     className: 'my-flights-airport-icon',
                     html: '<div></div>',
-                    iconSize: [14, 14]
+                    iconSize: [airport.size, airport.size]
                 })
-            }).addTo(map);
+            }).addTo(map).bindTooltip(tooltipContent);
         });
 
         animateNumber(document.getElementById('my-flights-count'), 0, payload.count, 1000);

@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (window.innerWidth > 500) {
             scrollPosition = document.body.scrollHeight;
         } else {
-            scrollPosition = containerPosition - (window.innerHeight - 370);
+            const containerTop = container.getBoundingClientRect().top + window.pageYOffset;
+            scrollPosition = containerTop - (window.innerHeight - 335);
         }
 
         window.scrollTo({

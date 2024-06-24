@@ -104,8 +104,9 @@ body {
 #main-container {
     border-radius: 10px 10px 0 0;
     width: 320px;
-    height: calc(100vh - 10px)!important;
-    margin: calc(100vh - 65px) 0 0 10px;
+    height: calc(100vh - 10px);
+    margin-top: calc(100vh - 65px);
+    margin-left: 10px;
 }
 
 #main-container-main-view, #main-container-aircraft-view {
@@ -561,7 +562,7 @@ a:hover {
     display: flex;
     justify-content: center;
     height: 500px;
-    width: 75%;
+    width: 750px;
     margin: 10px;
 }
 
@@ -575,6 +576,11 @@ a:hover {
     border-radius: 10px;
 }
 
+.my-flights-title-container {
+    width: 730px;
+    margin: 0 40px;
+}
+
 .my-flights-pre-title {
     font-size: 16px;
     color: grey;
@@ -584,12 +590,7 @@ a:hover {
 .my-flights-title {
     font-size: 30px;
     font-weight: bold;
-    width: calc(75% - 20px);
     margin-left: 60px;
-}
-
-.my-flights-airport-icon {
-
 }
 
 .my-flights-airport-icon div {
@@ -618,22 +619,47 @@ a:hover {
     width: calc(100% - 6px);
 }
 
-@supports(padding: max(0px)) {
+.leaflet-tooltip {
+    color: var(--colour);
+    background-color: var(--background-colour);
+    border-radius: 10px;
+    border: 0;
+    padding: 6px;
+    font-size: 12px;
+    font-family: var(--default-fonts);
+    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-tooltip-left:before {
+    border-left-color: var(--background-colour)
+}
+
+.leaflet-tooltip-right:before {
+    border-right-color: var(--background-colour)
+}
+
+@media (max-width: 770px) {
+    :root {
+        --colour: red!important;
+    }
+
+    .my-flights-container {
+        width: calc(100% - 20px);
+    }
+}
+
+@supports(padding: max(0px) and env(safe-area-inset-left)) {
     #main-container {
         margin-left: max(10px, env(safe-area-inset-left));
     }
 }
 
-
 @media (max-width: 500px) {
-    #my-flights-body {
-        border-radius: 10px 10px 0 0;
-    }
-
     #main-container {
         right: 10px;
         width: 100vw;
-        margin: calc(100vh - 65px) 0 0;
+        margin-left: 0;
+        margin-top: calc(100vh - 150px);
     }
 
     #aircraft-list > div {
@@ -660,10 +686,24 @@ a:hover {
     .aircraft-list-callsign, .aircraft-list-metrics {
         margin-left: 95px;
     }
+
+    #my-flights-body {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .my-flights-container {
+        flex-direction: column;
+        margin: 0;
+        height: 1040px;
+    }
+
+    .my-flights-content-box {
+        margin: 20px 10px 0;
+    }
 }
 
 @media (max-width: 290px) {
-    body:after {
+    body::after {
         content: 'The window is too thin.';
         background-color: var(--background-colour);
         color: var(--colour);
