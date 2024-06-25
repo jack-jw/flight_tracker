@@ -8,8 +8,7 @@
 //});
 
 document.addEventListener("DOMContentLoaded", function() {
-    let startContainerY, startContainerHeight, containerMomentum, maxContainerHeight;
-    let selection = info = polylines = null;
+    let selection = null, info = null, polylines = null;
 
     const socket = io();
     socket.emit('decoder.get')
@@ -136,6 +135,22 @@ document.addEventListener("DOMContentLoaded", function() {
                 return [lat, lon];
             }
 
+            function computeGreatCircleDistance(start, end) {
+                const R = 6371e3;
+                const lat1 = start.lat * Math.PI / 180;
+                const lon1 = start.lng * Math.PI / 180;
+                const lat2 = end.lat * Math.PI / 180;
+                const lon2 = end.lng * Math.PI / 180;
+                const deltaLat = lat2 - lat1;
+                const deltaLon = lon2 - lon1;
+                const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+                return distance;
+            }
+
             const startLatLng = L.latLng(startPoint);
             const endLatLng = L.latLng(endPoint);
 
@@ -148,8 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const line = L.polyline(curvePoints, { color: '#FF9500', weight: 2, opacity: opacity }).addTo(map);
             line.getElement().setAttribute('tabindex', '-1');
-            const distance = startLatLng.distanceTo(endLatLng); // need to implement great circle distance calc
-
+            const distance = computeGreatCircleDistance(startLatLng, endLatLng);
             return {'line': line, 'distance': distance};
         }
 
@@ -288,7 +302,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 individual.marker = L.marker([individual.lat, individual.lng], {
                     icon: L.divIcon({
                         className: 'aircraft-icon',
-                        html: `<img src="/image/icon/${individual.icon.icon}.svg"/>`,
+                        html: `<img src="/image/icon/${individual.icon.icon}"/>`,
                         iconSize: [individual.icon.size, individual.icon.size]
                     })
                 }).addTo(map);
@@ -374,7 +388,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('aircraft-img').src = '/image/aircraft/' + info.aircraft.reg;
         document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
-        document.getElementById('aircraft-airline-name').textContent = info.airline.name;
+        document.getElementById('aircraft-airline-name').textContent = info.airline.name.replace('International', "Int'l");
+        document.getElementById('aircraft-airline-name').textContent = info.airline.name.replace('International', "Int'l");
         document.getElementById('aircraft-callsign').textContent = info.callsign;
         document.getElementById('aircraft-callsign').title = info.radio;
         document.getElementById('aircraft-route-origin').textContent = info.origin.muni;

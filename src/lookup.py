@@ -438,22 +438,30 @@ def aircraft(address):
 
     return {"icao24": address, "country": "XX"}
 
-def aircraft_icon(address):
+def aircraft_icon(code):
     """
     Get the closest icon to an aircraft's actual type
-    Takes the aircraft's ICAO 24-bit address as a string
+    Takes the aircraft's ICAO 24-bit address or type code as a string
     Returns the type code of the closest icon
     """
 
-    if not address:
+    if not code:
         return {"icon": "generic", "size": 28}
 
-    address = address.lower()
-    aircraft_lookup = aircraft(address)
-    if "type" in aircraft_lookup:
-        result = _get_row("icontypes", "type", aircraft_lookup["type"])
-        if "icon" in result:
-            return result
+    if len(code) == 6:
+        address = code.lower()
+        aircraft_lookup = aircraft(address)
+        if "type" in aircraft_lookup:
+            type = aircraft_lookup["type"]
+        else:
+            return {"icon": "generic", "size": 28}
+
+    if len(code) == 4:
+        type = code.upper()
+
+    result = _get_row("icontypes", "type", type)
+    if "icon" in result:
+        return result
 
     return {"icon": "generic", "size": 28}
 

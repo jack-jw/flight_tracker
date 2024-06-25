@@ -95,9 +95,13 @@ def start():
             return send_from_directory(LOCAL_IMAGES, image)
         return placeholder, 200, {"Content-Type": "image/png"}
 
-    @app.route("/image/icon/<path:icontype>")
+    @app.route("/image/icon/<icontype>")
     def serve_icon(icontype):
-        return send_from_directory("static/aircraft", icontype)
+        return send_from_directory("static/aircraft", icontype + ".svg")
+
+    @app.route("/image/icon/untyped/<type>")
+    def serve_untyped_icon(type):
+        return send_from_directory("static/aircraft", lookup.aircraft_icon(type)["icon"] + ".svg")
 
     @socketio.on("decoder.get")
     def handle_decoder_get():

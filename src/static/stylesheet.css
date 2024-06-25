@@ -293,12 +293,12 @@ body {
     color: grey;
 }
 
-#aircraft-list-credits {
+.credits {
     color: grey;
     text-align: center;
     font-size: 12px;
     margin-top: 25px;
-    display:none;
+/*    display:none;*/
 }
 
 #aircraft-airline-callsign {
@@ -551,10 +551,9 @@ a:hover {
 }
 
 #my-flights-body #pfp {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     font-size: 30px;
-    margin-top: 4px;
     position: absolute;
 }
 
@@ -574,25 +573,36 @@ a:hover {
     height: 100%;
     background-color: var(--hover-colour);
     border-radius: 10px;
+    overflow: hidden;
 }
 
 .my-flights-title-container {
     width: 730px;
 }
 
-.my-flights-pre-title {
-    font-size: 16px;
+.my-flights-pre-title, .my-flights-rank-amount, .my-flights-alt-amount {
     color: grey;
-    margin-left: 60px;
+    font-weight: 500;
+}
+
+.my-flights-pre-title {
+    margin-left: 64px;
+    font-size: 16px;
 }
 
 .my-flights-title {
     font-size: 30px;
     font-weight: bold;
+    height: 1em;
 }
 
 .my-flights-title-container .my-flights-title {
-    margin-left: 60px;
+    margin-left: 64px;
+}
+
+#my-flights-country-count-flags .fis {
+    position: relative;
+    margin-right: 0.25em;
 }
 
 .my-flights-airport-icon div {
@@ -624,12 +634,14 @@ a:hover {
 .my-flights-airport-tooltip {
     color: var(--colour);
     background-color: var(--background-colour);
+    opacity: 1!important;
     border-radius: 10px;
     border: 0;
     padding: 8px 12px;
-    font-size: 12px;
     font-family: var(--default-fonts);
     box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px) saturate(1.8);
+    -webkit-backdrop-filter: blur(10px) saturate(1.8);
 }
 
 .my-flights-airport-tooltip-title {
@@ -665,6 +677,20 @@ a:hover {
     font-weight: 600;
 }
 
+.my-flights-alt-amount {
+    margin: 12px 24px;
+    font-size: 18px;
+    height: 1em;
+}
+
+#my-flights-continent-count {
+    margin-top: 24px;
+}
+
+.my-flights-rank-amount {
+    font-size: 14px;
+}
+
 .my-flights-rank-item {
     margin: 24px;
     display: flex;
@@ -687,10 +713,10 @@ a:hover {
 .my-flights-rank-icon.my-flights-airline-rank-icon::before {
     content: '';
     position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
+    top: 0;
+    left: 0;
+    width: 100%!important;
+    height: 100%;
     background: inherit;
     filter: blur(13px) saturate(1.8);
     clip-path: circle(calc(50%) at center);
@@ -703,6 +729,7 @@ a:hover {
     background-size: 30px;
     transform: rotate(45deg);
     background-color: var(--hover-colour);
+    filter: drop-shadow(2px 2px 2px var(--control-colour));
 }
 
 .my-flights-rank-number {
@@ -713,9 +740,18 @@ a:hover {
     width: 1ch;
 }
 
+.my-flights-rank-text {
+    margin-left: 10px;
+}
+
+.my-flights-rank-text div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .my-flights-rank-name {
     font-size: 24px;
-    margin-left: 10px;
 }
 
 @media (max-width: 770px) {

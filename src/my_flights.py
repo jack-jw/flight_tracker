@@ -17,7 +17,12 @@ def get():
     airlines = {}
     aircraft = {}
     airports = {}
+    continents = []
+    countries = []
+    domestic = 0
     flights = []
+    intercontinental = 0
+    international = 0
 
     # random flights for demo for now
     flights_table = (
@@ -41,12 +46,24 @@ def get():
         flights.append({"origin": flight["origin"], "destination": flight["destination"]})
 
         for airport in (flight["origin"], flight["destination"]):
-            info = lookup.airport(airport)
-            if info["icao"] in airports:
-                airports[info["icao"]]["flights"] += 1
+            if airport in airports:
+                airports[airport]["flights"] += 1
             else:
+                info = lookup.airport(airport)
                 airports[info["icao"]] = info
                 airports[info["icao"]]["flights"] = 1
+                if info["country"] not in countries:
+                    countries.append(info["country"])
+                if info["continent"] not in continents:
+                    continents.append(info["continent"])
+
+        if airports[flight["origin"]]["country"] == airports[flight["destination"]]["country"]:
+            domestic += 1
+        else:
+            international += 1
+
+        if airports[flight["origin"]]["continent"] != airports[flight["destination"]]["continent"]:
+            intercontinental += 1
 
         info = lookup.airline(flight["callsign"][:3])
         if info["icao"] in airlines:
@@ -64,12 +81,19 @@ def get():
         "airlines": airlines,
         "aircraft": aircraft,
         "airports": airports,
+        "continents": continents,
+        "countries": countries,
+        "counts": {
+            "intercontinental": intercontinental,
+            "international": international,
+            "domestic": domestic
+        },
         "flights": flights,
         "rankings": {
             "airlines": [],
             "aircraft": [],
             "airports": []
-        }
+        },
     }
 
     for category in response["rankings"]:
