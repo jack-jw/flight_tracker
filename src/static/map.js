@@ -102,21 +102,6 @@ document.addEventListener("DOMContentLoaded", function() {
         marker.moveInterval = setInterval(fly, 100);
     }
 
-    function centreOnSelection() {
-        const latlng = selection.marker.getLatLng();
-        const point = map.latLngToContainerPoint(latlng);
-        let xOffset = yOffset = 0;
-
-        if (window.innerWidth > 500) {
-            xOffset = -160;
-        } else {
-            yOffset = 180;
-        }
-        point.x += xOffset;
-        point.y += yOffset;
-        map.panTo(map.containerPointToLatLng(point));
-    }
-
     function plotRoutes() {
         function plotGreatCircleRoute(startPoint, endPoint, opacity) {
             function computeIntermediatePoint(start, end, ratio) {
@@ -311,6 +296,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 individual.marker.getElement().setAttribute('tabindex', '-1');
             }
 
+            if (individual.type === null) { individual.type = '' }
+            if (individual.reg === null) { individual.reg = '' }
+
             setAircraft(individual);
 
             const listItem = document.createElement('div');
@@ -321,7 +309,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <div>
                     <div class="aircraft-list-callsign">${individual.callsign}</div>
-                    <div class="aircraft-list-metrics">${individual.speed} KTS, ${individual.alt} FT, ${Math.round(individual.hdg)}º</div>
+                    <div class="aircraft-list-metrics">
+                        <b>${individual.reg}</b> ${individual.type}
+                    </div>
+                    <div class="aircraft-list-metrics">
+                        <span style="width: 1em; height: 1em">
+                            <span style="transform: rotate(${individual.hdg}deg); position: absolute">&uarr;</span>
+                        </span>
+                        <span style="margin-left: 1em">
+                            ${individual.speed} KTS
+                        </span>
+                    </div>
                 </div>
             `;
 
@@ -332,6 +330,20 @@ document.addEventListener("DOMContentLoaded", function() {
                     socket.emit("lookup.all", individual.icao24, individual.callsign);
                     event.stopPropagation();
                 }, true);
+            });
+
+            individual.marker.addEventListener('mouseover', function(event) {
+                if (window.innerWidth >= 500) {
+                    listItem.scrollIntoView({ behaviour: 'smooth' });
+                    listItem.setAttribute('id', 'aircraft-list-div-hover')
+                }
+            });
+
+            individual.marker.addEventListener('mouseout', function(event) {
+                if (window.innerWidth >= 500) {
+                    listItem.scrollIntoView({ behaviour: 'smooth' });
+                    listItem.setAttribute('id', null)
+                }
             });
         }
 
@@ -430,7 +442,14 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         plotRoutes();
-        centreOnSelection();
+
+        const point = map.latLngToContainerPoint([selection.lat, selection.lng]);
+        if (window.innerWidth <= 500) {
+            point.y += 180;
+        } else {
+            point.x += -160;
+        }
+        map.panTo(map.containerPointToLatLng(point));
 
         setContainerDefaultScroll('smooth');
         document.getElementById('back').addEventListener('click', clearMap);

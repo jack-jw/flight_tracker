@@ -93,8 +93,6 @@ body {
     box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
     background-color: var(--background-colour);
     color: var(--colour);
-    word-wrap: break-word;
-    overflow: hidden;
     backdrop-filter: blur(15px) saturate(1.8);
     -webkit-backdrop-filter: blur(15px) saturate(1.8);
     bottom: 0;
@@ -107,6 +105,7 @@ body {
     height: calc(100vh - 10px);
     margin-top: calc(100vh - 65px);
     margin-left: 10px;
+    overflow: hidden;
 }
 
 #main-container-main-view, #main-container-aircraft-view {
@@ -124,7 +123,6 @@ body {
     align-items: center;
     color: rgba(255, 255, 255, 0.75);
     font-weight: bold;
-    cursor: pointer;
     visibility: visible;
     opacity: 1;
     transition: opacity 0.25s ease, visibility 0s linear 0.25s;
@@ -233,7 +231,7 @@ body {
     margin: 0 15px;
 }
 
-#aircraft-list > div:hover {
+#aircraft-list > div:hover, #aircraft-list-div-hover {
     background-color: var(--hover-colour);
     border-radius: 10px;
 }
@@ -241,6 +239,9 @@ body {
 #aircraft-list > div:hover::before,
 #aircraft-list > div:hover + div::before,
 #aircraft-list > div:hover + #aircraft-list-count::before,
+#aircraft-list > #aircraft-list-div-hover::before,
+#aircraft-list > #aircraft-list-div-hover + div::before,
+#aircraft-list > #aircraft-list-div-hover + #aircraft-list-count::before,
 #aircraft-list > div:active::before,
 #aircraft-list > div:active + div::before,
 #aircraft-list > div:active + #aircraft-list-count::before {
@@ -298,7 +299,10 @@ body {
     text-align: center;
     font-size: 12px;
     margin-top: 25px;
-/*    display:none;*/
+}
+
+#main-container .credits {
+    display: none; /* for now until I sort out the layout */
 }
 
 #aircraft-airline-callsign {
@@ -508,6 +512,7 @@ hr {
 a, a:hover, a:active, a:visited {
     color: inherit;
     text-decoration: none;
+    cursor: pointer;
 }
 
 a:hover {
@@ -534,13 +539,8 @@ a:hover {
     font-size: 16px;
 }
 
-.metre-progress {
-    transition: stroke-dashoffset 0.1s ease;
-}
-
 #my-flights-body {
     margin: 75vh 0 0;
-    right: 0;
     height: auto;
     width: 100%;
     padding: 20px 0;
@@ -557,23 +557,30 @@ a:hover {
     position: absolute;
 }
 
-.my-flights-container {
+.my-flights-parent {
     display: flex;
     justify-content: center;
-    height: 435px;
-    width: 750px;
+    width: 100%;
+    height: auto;
+}
+
+.my-flights-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: auto;
+    width: 360px;
     margin: 10px;
 }
 
 .my-flights-content-box {
     -webkit-backdrop-filter: blur(15px);
     backdrop-filter: blur(10px);
-    margin: 10px;
-    flex: 1;
-    height: 100%;
+    margin: 10px 0;
+    height: auto;
+    width: 100%;
     background-color: var(--hover-colour);
     border-radius: 10px;
-    overflow: hidden;
 }
 
 .my-flights-title-container {
@@ -593,7 +600,7 @@ a:hover {
 .my-flights-title {
     font-size: 30px;
     font-weight: bold;
-    height: 1em;
+    min-height: 1em;
 }
 
 .my-flights-title-container .my-flights-title {
@@ -673,18 +680,18 @@ a:hover {
 }
 
 .my-flights-content-box .my-flights-title {
-    margin: 24px;
+    margin: 24px 24px 12px;
     font-weight: 600;
 }
 
 .my-flights-alt-amount {
     margin: 12px 24px;
     font-size: 18px;
-    height: 1em;
+    min-height: 1em;
 }
 
 #my-flights-continent-count {
-    margin-top: 24px;
+    margin: 24px;
 }
 
 .my-flights-rank-amount {
@@ -700,17 +707,17 @@ a:hover {
 
 .my-flights-rank-icon {
     position: relative;
-    height: 46px;
+    width: 46px;
     border-radius: 50%;
     margin-left: 30px;
     overflow: hidden;
 }
 
-.my-flights-rank-icon.my-flights-airline-rank-icon {
+.my-flights-content-box.airlines .my-flights-rank-icon {
     background-size: 24px;
 }
 
-.my-flights-rank-icon.my-flights-airline-rank-icon::before {
+.my-flights-content-box.airlines .my-flights-rank-icon::before {
     content: '';
     position: absolute;
     top: 0;
@@ -725,7 +732,7 @@ a:hover {
     z-index: -1;
 }
 
-.my-flights-rank-icon.my-flights-aircraft-rank-icon {
+.my-flights-content-box.types .my-flights-rank-icon {
     background-size: 30px;
     transform: rotate(45deg);
     background-color: var(--hover-colour);
@@ -744,22 +751,16 @@ a:hover {
     margin-left: 10px;
 }
 
-.my-flights-rank-text div {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .my-flights-rank-name {
     font-size: 24px;
 }
 
-@media (max-width: 770px) {
-    .my-flights-container, .my-flights-title-container {
+@media (max-width: 780px) {
+    .my-flights-container, .my-flights-title-container, .my-flights-parent {
         width: calc(100% - 20px);
     }
     .my-flights-title-container {
-        margin-left: 20px;
+        margin-left: 30px;
     }
 }
 
@@ -806,10 +807,13 @@ a:hover {
         border-radius: 10px 10px 0 0;
     }
 
-    .my-flights-container {
+    .my-flights-parent {
         flex-direction: column;
+        align-items: center;
+    }
+
+    .my-flights-container {
         margin: 0;
-        height: 910px;
     }
 
     .my-flights-content-box {

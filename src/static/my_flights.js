@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         Object.keys(payload.rankings).forEach(function(category) {
             const baseClass = `my-flights-${category}-`;
-            for (let i = 0; i < payload.rankings[category].length; i++) {
+            for (let i = 0; i < 5; i++) {
                 const rankItem = document.getElementById(baseClass + i);
                 const rankIcon = rankItem.querySelector('.my-flights-rank-icon');
                 let displayName, imageUrl;
@@ -193,9 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (category === 'airlines') {
                     displayName = payload.airlines[payload.rankings.airlines[i].icao].name;
                     imageUrl = 'https://www.flightaware.com/images/airline_logos/180px/' + payload.rankings.airlines[i].icao + '.png';
-                } else if (category === 'aircraft') {
-                    displayName = payload.rankings.aircraft[i].icao;
-                    imageUrl = '/image/icon/untyped/' + payload.rankings.aircraft[i].icao;
+                } else if (category === 'types') {
+                    displayName = payload.rankings.types[i].icao;
+                    imageUrl = '/image/icon/untyped/' + payload.rankings.types[i].icao;
                 } else if (category === 'airports') {
                     displayName = payload.airports[payload.rankings.airports[i].icao].iata;
                     imageUrl = 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/flags/1x1/' + payload.airports[payload.rankings.airports[i].icao].country.toLowerCase() + '.svg';

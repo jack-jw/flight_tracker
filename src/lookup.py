@@ -206,6 +206,7 @@ def check():
             update(table)
     cursor.close()
     main_db.close()
+    update("my_flights")
     update("routes")
 
 def update(table):
@@ -294,6 +295,19 @@ def update(table):
         )
 
         _csv_to_db(_DATABASE, _PREFIXES_URL, "prefixes", prefix_headers, "prefix")
+
+    elif table == "my_flights":
+        instance_db = sqlite3.connect(_INSTANCE_DATABASE)
+        cursor = instance_db.cursor()
+
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name = 'my_flights'")
+        if cursor.fetchone() is None:
+            cursor.execute("CREATE TABLE my_flights "
+                           "('date' TEXT, 'origin' TEXT, 'destination' TEXT, 'callsign' TEXT, 'reg' TEXT, 'type' TEXT)")
+
+        cursor.close()
+        instance_db.commit()
+        instance_db.close()
 
     elif table == "routes":
         instance_db = sqlite3.connect(_INSTANCE_DATABASE)
@@ -438,26 +452,17 @@ def aircraft(address):
 
     return {"icao24": address, "country": "XX"}
 
-def aircraft_icon(code):
+def aircraft_icon(type):
     """
     Get the closest icon to an aircraft's actual type
-    Takes the aircraft's ICAO 24-bit address or type code as a string
+    Takes the aircraft's type code as a string
     Returns the type code of the closest icon
     """
 
-    if not code:
+    if not type:
         return {"icon": "generic", "size": 28}
 
-    if len(code) == 6:
-        address = code.lower()
-        aircraft_lookup = aircraft(address)
-        if "type" in aircraft_lookup:
-            type = aircraft_lookup["type"]
-        else:
-            return {"icon": "generic", "size": 28}
-
-    if len(code) == 4:
-        type = code.upper()
+    type = type.upper()
 
     result = _get_row("icontypes", "type", type)
     if "icon" in result:
@@ -485,6 +490,48 @@ def airport(code):
         return _get_row("airports", "icao", code)
 
     return None
+
+def basic(address):
+    """
+    Get basic info for an aircraft (icontype, tail number, type code)
+    Takes the aircraft's ICAO 24-bit address as a string
+    Returns aircraft info as a dictionary with keys icon, reg, type
+    """
+
+    address = address.lower()
+    aircraft_lookup = aircraft(address)
+    if "reg" in aircraft_lookup:
+        reg = aircraft_lookup["reg"]
+    else:
+        reg = None
+
+    if "type" in aircraft_lookup:
+        type = aircraft_lookup["type"]
+    else:
+        type = None
+
+    icon = aircraft_icon(type)
+    if "type" in icon:
+        del icon["type"]
+
+    return {"icon": icon, "reg": reg, "type": type}
+
+def get_my_flights_table():
+    """
+    Get the my_flights table
+    Returns the table as a list of dictionaries
+    """
+
+    update("my_flights")
+
+    db = sqlite3.connect(_INSTANCE_DATABASE)
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM my_flights")
+    rows = cursor.fetchall()
+    db.close()
+
+    return [dict(row) for row in rows]
 
 def route(callsign):
     """

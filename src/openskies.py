@@ -65,7 +65,7 @@ def _format(individual):
         result["alt"] = int(result["alt"] * 3.281) # to ft
         result["speed"] = int(result["speed"] * 1.944) # to kts
         result["callsign"] = (result["callsign"][:3] + result["callsign"][3:].lstrip("0")).strip()
-        result["icon"] = lookup.aircraft_icon(result["icao24"])
+        result.update(lookup.basic(result["icao24"]))
         return result
     return None
 

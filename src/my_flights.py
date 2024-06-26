@@ -13,9 +13,8 @@ def _eval_ranking(addition, ranking):
     return ranking
 
 def get():
-    # flights_table = lookup.get_my_flights_table()
+    flights_table = lookup.get_my_flights_table()
     airlines = {}
-    aircraft = {}
     airports = {}
     continents = []
     countries = []
@@ -23,24 +22,7 @@ def get():
     flights = []
     intercontinental = 0
     international = 0
-
-    # random flights for demo for now
-    flights_table = (
-        {"origin": "EGLL", "destination": "WSSS", "aircraft": "B789", "callsign": "BAW15"},
-        {"origin": "WSSS", "destination": "YSSY", "aircraft": "B789", "callsign": "BAW15"},
-        {"origin": "YSSY", "destination": "WSSS", "aircraft": "B789", "callsign": "BAW16"},
-        {"origin": "YSSY", "destination": "VHHH", "aircraft": "A35K", "callsign": "CPA100"},
-        {"origin": "VHHH", "destination": "EGLL", "aircraft": "B772", "callsign": "CPA238"},
-        {"origin": "EGLL", "destination": "KSFO", "aircraft": "B772", "callsign": "BAW285"},
-        {"origin": "EGLL", "destination": "KIAD", "aircraft": "B772", "callsign": "BAW293"},
-        {"origin": "NFFN", "destination": "YSSY", "aircraft": "B738", "callsign": "VOZ184"},
-        {"origin": "EDDB", "destination": "EGLL", "aircraft": "A320", "callsign": "BAW995"},
-        {"origin": "RJTT", "destination": "EGLL", "aircraft": "B789", "callsign": "JAL41"},
-        {"origin": "YSSY", "destination": "RJTT", "aircraft": "B789", "callsign": "JAL51"},
-        {"origin": "YSSY", "destination": "YPPH", "aircraft": "A333", "callsign": "QFA641"},
-        {"origin": "NFFN", "destination": "YSSY", "aircraft": "B738", "callsign": "VOZ184"},
-        {"origin": "EGLC", "destination": "EDDB", "aircraft": "E195", "callsign": "CFE7029"}
-    )
+    types = {}
 
     for flight in flights_table:
         flights.append({"origin": flight["origin"], "destination": flight["destination"]})
@@ -72,17 +54,16 @@ def get():
             airlines[info["icao"]] = info
             airlines[info["icao"]]["flights"] = 1
 
-        if flight["aircraft"] in aircraft:
-            aircraft[flight["aircraft"]]["flights"] += 1
+        if flight["type"] in types:
+            types[flight["type"]]["flights"] += 1
         else:
-            aircraft[flight["aircraft"]] = {"flights": 1, "icao": flight["aircraft"]}
+            types[flight["type"]] = {"flights": 1, "icao": flight["type"]}
 
     response = {
         "airlines": airlines,
-        "aircraft": aircraft,
         "airports": airports,
-        "continents": continents,
-        "countries": countries,
+        "continents": sorted(continents),
+        "countries": sorted(countries),
         "counts": {
             "intercontinental": intercontinental,
             "international": international,
@@ -91,9 +72,10 @@ def get():
         "flights": flights,
         "rankings": {
             "airlines": [],
-            "aircraft": [],
+            "types": [],
             "airports": []
         },
+        "types": types
     }
 
     for category in response["rankings"]:
@@ -102,6 +84,6 @@ def get():
             ranking_entry = {"icao": individual["icao"], "flights": individual["flights"]}
             response["rankings"][category] = _eval_ranking(ranking_entry, response["rankings"][category])
         response["rankings"][category].reverse()
-        response["rankings"][category] = response["rankings"][category][:5]
+        response["rankings"][category] = response["rankings"][category]
 
     return response
