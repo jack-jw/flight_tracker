@@ -11,6 +11,7 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * ~~Make aircraft animate across the map even without being updated~~
             * Fix animations bugging over time - is this just because there are a lot of aircraft in the OS API JSON?
         * ~~Add special icons for aircraft (by type)~~
+            * Rear-mounted engine narrowbody, small twin turboprop (use AT72? too big?), and helicopter (animate!) icons
         * Make it so more than 500 aircraft can be on the map at once - server or client side selection of aircraft?
         * Add UI to import from openskies, not just locally?
         * State saving - JSONs or through the web interface?
@@ -18,7 +19,7 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * ~~Add callsigns and metrics~~
         * ~~Add airline logos from FlightAware~~
         * ~~Reorganise (airline logos too big?)~~
-        * Change metrics shown?
+        * ~~Change metrics shown?~~
         * ~~Optimise and fix buggy scrolling on mobile~~
     * Flight detail view
         * ~~Fix horrendous implementation in JS~~

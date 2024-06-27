@@ -430,18 +430,18 @@ def airline(callsign):
 
     return {"icao": code}
 
-def aircraft(address):
+def aircraft(icao24):
     """
     Look up an aircraft
     Takes the aircraft's ICAO 24-bit address as a string
     Returns aircraft info as a dictionary with keys as defined in update()
     """
 
-    if not address:
+    if not icao24:
         return None
 
-    address = address.lower()
-    result = _get_row("aircraft", "icao24", address)
+    icao24 = icao24.lower()
+    result = _get_row("aircraft", "icao24", icao24)
     if result:
         if "reg" in result:
             result["country"] = _get_country_from_reg(result["reg"])
@@ -450,7 +450,7 @@ def aircraft(address):
 
         return result
 
-    return {"icao24": address, "country": "XX"}
+    return {"icao24": icao24, "country": "XX"}
 
 def aircraft_icon(type):
     """
@@ -491,15 +491,14 @@ def airport(code):
 
     return None
 
-def basic(address):
+def basic(icao24):
     """
     Get basic info for an aircraft (icontype, tail number, type code)
     Takes the aircraft's ICAO 24-bit address as a string
     Returns aircraft info as a dictionary with keys icon, reg, type
     """
 
-    address = address.lower()
-    aircraft_lookup = aircraft(address)
+    aircraft_lookup = aircraft(icao24)
     if "reg" in aircraft_lookup:
         reg = aircraft_lookup["reg"]
     else:

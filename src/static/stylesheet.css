@@ -87,6 +87,7 @@ body {
     margin-right: auto;
     background-color: var(--control-colour);
     border-radius: 2.5px;
+    opacity: 0;
 }
 
 #main-container, #my-flights-body {
@@ -95,21 +96,20 @@ body {
     color: var(--colour);
     backdrop-filter: blur(15px) saturate(1.8);
     -webkit-backdrop-filter: blur(15px) saturate(1.8);
-    bottom: 0;
-    left: 0;
 }
 
 #main-container {
-    border-radius: 10px 10px 0 0;
     width: 320px;
-    height: calc(100vh - 10px);
-    margin-top: calc(100vh - 65px);
-    margin-left: 10px;
+    height: 100vh;
     overflow: hidden;
 }
 
 #main-container-main-view, #main-container-aircraft-view {
-    max-height: 100%;
+    height: 100%;
+}
+
+#main-container-main-view {
+    overflow: hidden;
 }
 
 #aircraft-info {
@@ -190,7 +190,7 @@ body {
 #aircraft-list {
     margin-top: 55px;
     overflow: scroll;
-    height: calc(100vh - 75px);;
+    height: calc(100vh - 65px);
 }
 
 #aircraft-list > div, #aircraft-list-count {
@@ -755,6 +755,53 @@ a:hover {
     font-size: 24px;
 }
 
+@media (pointer: coarse) {
+    #main-container {
+        height: calc(100vh - 10px);
+        margin-top: calc(100vh - 145px)!important;
+        margin-left: 10px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    @supports(margin: max(0px) and env(safe-area-inset-left)) {
+        #main-container {
+            margin-left: max(10px, env(safe-area-inset-left));
+        }
+    }
+
+    #resize-handle {
+        opacity: 1;
+    }
+
+    #back, #info {
+        width: 32px;
+        height: 32px;
+        margin: 10px;
+        font-size: 20px;
+    }
+
+    #main-container-main-view #pfp {
+        width: 36px;
+        height: 36px;
+        font-size: 24px;
+    }
+
+    #aircraft-list {
+        height: calc(100vh - 75px);
+    }
+
+    #aircraft-list-filter {
+        height: 36px;
+        width: calc(100% - 92px);
+        font-size: 18px;
+        padding: 0 8px;
+    }
+
+    #aircraft-list-clear {
+        top: 24px;
+    }
+}
+
 @media (max-width: 780px) {
     .my-flights-container, .my-flights-title-container, .my-flights-parent {
         width: calc(100% - 20px);
@@ -764,18 +811,22 @@ a:hover {
     }
 }
 
-@supports(padding: max(0px) and env(safe-area-inset-left)) {
-    #main-container {
-        margin-left: max(10px, env(safe-area-inset-left));
-    }
-}
-
 @media (max-width: 500px) {
     #main-container {
         right: 10px;
         width: 100vw;
         margin-left: 0;
-        margin-top: calc(100vh - 150px);
+        margin-top: calc(100vh - 65px);
+        border-radius: 10px 10px 0 0;
+        height: calc(100vh - 10px);
+    }
+
+    #resize-handle {
+        opacity: 1;
+    }
+
+    #aircraft-list {
+        height: calc(100vh - 75px);
     }
 
     #aircraft-list > div {
@@ -843,31 +894,5 @@ a:hover {
     }
     body {
         position: fixed!important;
-    }
-}
-
-@media (pointer: coarse) {
-    #back, #info {
-        width: 32px;
-        height: 32px;
-        margin: 10px;
-        font-size: 20px;
-    }
-
-    #main-container-main-view #pfp {
-        width: 36px;
-        height: 36px;
-        font-size: 24px;
-    }
-
-    #aircraft-list-filter {
-        height: 36px;
-        width: calc(100% - 92px);
-        font-size: 18px;
-        padding: 0 8px;
-    }
-
-    #aircraft-list-clear {
-        top: 24px;
     }
 }

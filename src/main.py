@@ -125,10 +125,10 @@ def start():
         lookup.add_destination(callsign, destination)
 
     @socketio.on("lookup.all")
-    def handle_lookup_all(aircraft_address, callsign):
+    def handle_lookup_all(icao24, callsign):
         info = {}
         info["airline"] = lookup.airline(callsign)
-        info["aircraft"] = lookup.aircraft(aircraft_address)
+        info["aircraft"] = lookup.aircraft(icao24)
         info["callsign"] = callsign
 
         if "radio" in info["airline"]:

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let selection = null, info = null, polylines = null;
 
     const socket = io();
-    socket.emit('decoder.get')
+    socket.emit('decoder.get');
     socket.on('disconnect', function() {
         location.reload();
     });
@@ -35,19 +35,18 @@ document.addEventListener("DOMContentLoaded", function() {
             behavior: scrollBehaviour
         });
     }
-    setContainerDefaultScroll('instant')
+    setContainerDefaultScroll('instant');
 
     // MARK: - Map
 
     function clearMap() {
         map.eachLayer(function(layer) {
-            if (layer instanceof L.Polyline) { map.removeLayer(layer) }
+            if (layer instanceof L.Polyline) { map.removeLayer(layer); }
         });
 
-        Object.keys(aircraft).forEach(function(key) {
+        Object.values(aircraft).forEach(function(aircraft) {
             try {
-                const marker = aircraft[key].marker;
-                marker.getElement().style.opacity = null;
+                aircraft.marker.getElement().style.opacity = null;
             } catch {}
         });
 
@@ -60,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('origin-input').outerHTML = document.getElementById('origin-input').outerHTML;
         document.getElementById('destination-input').outerHTML = document.getElementById('destination-input').outerHTML;
-        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder"
+        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder";
 
         selection = info = polylines = null;
         document.getElementById('main-container-main-view').style.display = null;
@@ -88,14 +87,12 @@ document.addEventListener("DOMContentLoaded", function() {
             const changeInLng = Math.sin(radianAngle) * (speed / (111111 * Math.cos(marker.getLatLng().lat * (Math.PI / 180))));
             const currentLatLng = marker.getLatLng();
             const newLatLng = {
-            lat: currentLatLng.lat + changeInLat,
-            lng: currentLatLng.lng + changeInLng
+                lat: currentLatLng.lat + changeInLat,
+                lng: currentLatLng.lng + changeInLng
             }
             marker.setLatLng(newLatLng);
-            if (selection !== null && polylines !== null) {
-                if (selection.icao24 === polylines.icao24) {
-                    plotRoutes()
-                }
+            if (selection !== null && polylines !== null && selection.icao24 === polylines.icao24) {
+                plotRoutes();
             }
         }
 
@@ -106,31 +103,31 @@ document.addEventListener("DOMContentLoaded", function() {
         function plotGreatCircleRoute(startPoint, endPoint, opacity) {
             function computeIntermediatePoint(start, end, ratio) {
                 const lat1 = start.lat * Math.PI / 180;
-                const lon1 = start.lng * Math.PI / 180;
+                const lng1 = start.lng * Math.PI / 180;
                 const lat2 = end.lat * Math.PI / 180;
-                const lon2 = end.lng * Math.PI / 180;
-                const d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lon1 - lon2) / 2), 2)));
+                const lng2 = end.lng * Math.PI / 180;
+                const d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lng1 - lng2) / 2), 2)));
                 const A = Math.sin((1 - ratio) * d) / Math.sin(d);
                 const B = Math.sin(ratio * d) / Math.sin(d);
-                const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
-                const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+                const x = A * Math.cos(lat1) * Math.cos(lng1) + B * Math.cos(lat2) * Math.cos(lng2);
+                const y = A * Math.cos(lat1) * Math.sin(lng1) + B * Math.cos(lat2) * Math.sin(lng2);
                 const z = A * Math.sin(lat1) + B * Math.sin(lat2);
                 const lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
-                const lon = Math.atan2(y, x) * 180 / Math.PI;
-                return [lat, lon];
+                const lng = Math.atan2(y, x) * 180 / Math.PI;
+                return [lat, lng];
             }
 
             function computeGreatCircleDistance(start, end) {
                 const R = 6371e3;
                 const lat1 = start.lat * Math.PI / 180;
-                const lon1 = start.lng * Math.PI / 180;
+                const lng1 = start.lng * Math.PI / 180;
                 const lat2 = end.lat * Math.PI / 180;
-                const lon2 = end.lng * Math.PI / 180;
+                const lng2 = end.lng * Math.PI / 180;
                 const deltaLat = lat2 - lat1;
-                const deltaLon = lon2 - lon1;
+                const deltalng = lng2 - lng1;
                 const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
                 Math.cos(lat1) * Math.cos(lat2) *
-                Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+                Math.sin(deltalng / 2) * Math.sin(deltalng / 2);
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 const distance = R * c;
                 return distance;
@@ -220,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-    setTheme("satellite")
+    setTheme("satellite");
 
     map.on('click', function() {
         if (window.innerWidth <= 500) {
@@ -230,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 behavior: 'smooth'
             });
         }
-        clearMap()
+        clearMap();
     });
 
     document.getElementById('aircraft-list-clear').addEventListener('click', function() {
@@ -253,11 +250,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const aircraftList = document.getElementById('aircraft-list').children;
         Array.from(aircraftList).forEach(item => {
             if (item.tagName === 'DIV') {
-                const callsign = item.querySelector('.aircraft-list-callsign').textContent;
-                if (callsign.includes(filterValue)) {
+                const icao24 = item.className.substring(1);
+                if (item.textContent.includes(filterValue)) {
                     item.style.display = null;
+                    aircraft[icao24].marker.getElement().style.display = null
                 } else {
                     item.style.display = 'none';
+                    aircraft[icao24].marker.getElement().style.display = 'none'
                 }
             } else if (filterValue === '') {
                 item.style.display = null;
@@ -325,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             aircraftList.appendChild(listItem);
 
-            document.querySelectorAll(`._${individual.icao24}`).forEach(element => {
+            [listItem, individual.marker.getElement()].forEach(element => {
                 element.addEventListener('click', function(event) {
                     socket.emit("lookup.all", individual.icao24, individual.callsign);
                     event.stopPropagation();
@@ -333,14 +332,14 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             individual.marker.addEventListener('mouseover', function(event) {
-                if (window.innerWidth >= 500) {
+                if (window.innerWidth >= 500 && !window.matchMedia("(pointer: coarse)").matches) {
                     listItem.scrollIntoView({ behaviour: 'smooth' });
                     listItem.setAttribute('id', 'aircraft-list-div-hover')
                 }
             });
 
             individual.marker.addEventListener('mouseout', function(event) {
-                if (window.innerWidth >= 500) {
+                if (window.innerWidth >= 500 && !window.matchMedia("(pointer: coarse)").matches) {
                     listItem.scrollIntoView({ behaviour: 'smooth' });
                     listItem.setAttribute('id', null)
                 }
@@ -387,10 +386,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         selection = aircraft[info.aircraft.icao24];
 
-        Object.keys(aircraft).forEach(function(key) {
+        Object.values(aircraft).forEach(function(aircraft) {
             try {
-                const marker = aircraft[key].marker;
-                marker.getElement().style.opacity = '50%';
+                aircraft.marker.getElement().style.opacity = '50%';
             } catch {}
         });
         selection.marker.getElement().style.opacity = '100%';
@@ -400,7 +398,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById('aircraft-img').src = '/image/aircraft/' + info.aircraft.reg;
         document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
-        document.getElementById('aircraft-airline-name').textContent = info.airline.name.replace('International', "Int'l");
         document.getElementById('aircraft-airline-name').textContent = info.airline.name.replace('International', "Int'l");
         document.getElementById('aircraft-callsign').textContent = info.callsign;
         document.getElementById('aircraft-callsign').title = info.radio;
@@ -443,11 +440,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         plotRoutes();
 
-        const point = map.latLngToContainerPoint([selection.lat, selection.lng]);
+        const point = map.latLngToContainerPoint(selection.marker.getLatLng());
         if (window.innerWidth <= 500) {
             point.y += 180;
         } else {
-            point.x += -160;
+            point.x -= 160;
         }
         map.panTo(map.containerPointToLatLng(point));
 

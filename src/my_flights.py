@@ -3,15 +3,6 @@
 import lookup
 from bisect import bisect_left
 
-def _eval_ranking(addition, ranking):
-    if ranking:
-        ranking_keys = [d["flights"] for d in ranking]
-        rank = bisect_left(ranking_keys, addition["flights"])
-    else:
-        rank = 0
-    ranking.insert(rank, addition)
-    return ranking
-
 def get():
     flights_table = lookup.get_my_flights_table()
     airlines = {}
@@ -82,7 +73,12 @@ def get():
         for key in response[category]:
             individual = response[category][key]
             ranking_entry = {"icao": individual["icao"], "flights": individual["flights"]}
-            response["rankings"][category] = _eval_ranking(ranking_entry, response["rankings"][category])
+            if response["rankings"][category]:
+                ranking_keys = [d["flights"] for d in response["rankings"][category]]
+                rank = bisect_left(ranking_keys, ranking_entry["flights"])
+            else:
+                rank = 0
+            response["rankings"][category].insert(rank, ranking_entry)
         response["rankings"][category].reverse()
         response["rankings"][category] = response["rankings"][category]
 
