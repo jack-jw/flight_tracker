@@ -4,16 +4,22 @@ very much a work in progress is not functional yet at all!!
 
 Hopefully eventually an ADSB decoder and web flight tracking interface
 
+## Installation & usage for now
+1. Clone this repository and run `pip install -r requirements.txt` (preferably in a virtual environment)
+2. Get an API response from [the OpenSky Network](https://opensky-network.org/api/states/all) and save it to your computer as a JSON file
+3. `cd` to `src/` and then `python3 main.py /path/to/JSON/file`
+4. Visit the site at http://localhost:5003
+
 ## To-do
-* Make web interface (using openskies api demo json files for testing)
+* Make web interface (using opensky api demo json files for testing)
     * Map
         * ~~Add aircraft~~
         * ~~Make aircraft animate across the map even without being updated~~
-            * Fix animations bugging over time - is this just because there are a lot of aircraft in the OS API JSON?
+            * Fix animations bugging over time - is this just because there are a lot of aircraft in the OS API state?
         * ~~Add special icons for aircraft (by type)~~
             * Rear-mounted engine narrowbody, small twin turboprop (use AT72? too big?), and helicopter (animate!) icons
-        * Make it so more than 500 aircraft can be on the map at once - server or client side selection of aircraft?
-        * Add UI to import from openskies, not just locally?
+        * Make it so more than 500-ish aircraft can be on the map at once (performance limitation) - server or client side selection of aircraft?
+        * ~~Add UI to import from opensky, not just locally?~~ OpenSky is only for development so this would be a waste of time
         * State saving - JSONs or through the web interface?
     * Aircraft list/sidebar
         * ~~Add callsigns and metrics~~
@@ -28,7 +34,7 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
                 * Not visible in mobile! find workaround!
         * ~~Tail number identification from database~~
             * ~~Plane image from JetPhotos~~
-            * Add algorithms for specific countries when the tails are not on openskies database, e.g. US N-numbers?
+            * Add algorithms for specific countries when the tails are not on OpenSky database, e.g. US N-numbers?
         * ~~Country identification from tail number~~
             * ~~Add flag~~
             * Change algorithm/DB to identify countries by their ICAO24 address and not the tail number (more reliable and can identify things tail numbers can't e.g. Taiwan)

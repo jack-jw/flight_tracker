@@ -38,17 +38,19 @@ def get():
         if airports[flight["origin"]]["continent"] != airports[flight["destination"]]["continent"]:
             intercontinental += 1
 
-        info = lookup.airline(flight["callsign"][:3])
-        if info["icao"] in airlines:
-            airlines[info["icao"]]["flights"] += 1
-        else:
-            airlines[info["icao"]] = info
-            airlines[info["icao"]]["flights"] = 1
+        if flight["callsign"]:
+            info = lookup.airline(flight["callsign"][:3])
+            if info["icao"] in airlines:
+                airlines[info["icao"]]["flights"] += 1
+            else:
+                airlines[info["icao"]] = info
+                airlines[info["icao"]]["flights"] = 1
 
-        if flight["type"] in types:
-            types[flight["type"]]["flights"] += 1
-        else:
-            types[flight["type"]] = {"flights": 1, "icao": flight["type"]}
+        if flight["type"]:
+            if flight["type"] in types:
+                types[flight["type"]]["flights"] += 1
+            else:
+                types[flight["type"]] = {"flights": 1, "icao": flight["type"]}
 
     response = {
         "airlines": airlines,
@@ -83,3 +85,17 @@ def get():
         response["rankings"][category] = response["rankings"][category]
 
     return response
+
+def csv():
+    dict_table = lookup.get_my_flights_table()
+    csv_table = "date,origin,destination,callsign,reg,type"
+
+    for dict_row in dict_table:
+        csv_row = "\n"
+        for key, item in dict_row.items():
+            if not item:
+                item = ""
+            csv_row += item + ","
+        csv_table += csv_row[:-1]
+
+    return csv_table

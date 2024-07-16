@@ -7,18 +7,20 @@ Functions:
     start()
 """
 
+from gevent import monkey
+monkey.patch_all()
+
 from os import urandom, getlogin
 from os.path import exists
+from sys import argv
 from base64 import b64decode
-from threading import Thread
-from random import shuffle
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_socketio import SocketIO, emit
 
 from paths import INSTANCE_IMAGES, LOCAL_IMAGES
 import lookup
 import jetphotos
-import openskies
+import opensky
 import my_flights
 
 nato = {
@@ -66,19 +68,23 @@ def start():
     """
 
     # will be replaced by the actual decoder later
-    aircraft = openskies.load("../os.json", num_only=True)
+    if len(argv) != 2:
+        raise SystemExit(f"usage: {__file__} [path/to/OpenSky/API/response]")
+    if not exists(argv[1]) or not argv[1].endswith(".json"):
+        raise SystemExit(f"Invalid file: {argv[1]}")
+    aircraft = opensky.load(argv[1].replace("\\", "").strip(), num_only=True)
 
     app = Flask("flight_tracker")
     app.config["SECRET_KEY"] = urandom(24)
-    socketio = SocketIO(app)
+    socketio = SocketIO(app, async_mode="gevent")
 
     @app.route("/")
     def serve_map():
         return render_template("map.html", initial=getlogin()[:1].upper(), colour="#3478F6")
 
-    @app.route("/my")
-    def serve_my_flights():
-        return render_template("my_flights.html", name=getlogin(), initial=getlogin()[:1].upper(), colour="#3478F6")
+    @app.route("/image/flag/<country>")
+    def serve_flag(country):
+        return send_from_directory("static/flags", country.lower() + ".svg")
 
     @app.route("/image/aircraft/<tail>")
     def serve_aircraft_image(tail):
@@ -103,12 +109,21 @@ def start():
     def serve_untyped_icon(type):
         return send_from_directory("static/aircraft", lookup.aircraft_icon(type)["icon"] + ".svg")
 
+    @app.route("/my")
+    def serve_my_flights():
+        return render_template("my_flights.html", name=getlogin(), initial=getlogin()[:1].upper(), colour="#3478F6")
+
+    @app.route("/my.json")
+    def serve_my_flights_json():
+        return jsonify(my_flights.get())
+
+    @app.route("/my.csv")
+    def serve_my_flights_csv():
+        return my_flights.csv(), 200, {"Content-Type": "text/csv"}
+
     @socketio.on("decoder.get")
     def handle_decoder_get():
-        aircraft_list = list(aircraft.items())
-        shuffle(aircraft_list)
-        shuffled_aircraft = dict(aircraft_list[:750])
-        emit("decoder.get", shuffled_aircraft)
+        emit("decoder.get", opensky.preemit(aircraft))
 
     @socketio.on("lookup.airport")
     def handle_lookup_airport(code, routing=None):
@@ -162,34 +177,9 @@ def start():
 
         emit("lookup.all", info)
 
-    @socketio.on("my_flights.get")
-    def handle_my_flights_get():
-        emit("my_flights.get", my_flights.get())
-
-    socket_thread = Thread(target=socketio.run, args=(app, "0.0.0.0", 5003))
-    socket_thread.start()
+    print("Running on http://localhost:5003")
+    socketio.run(app, host="0.0.0.0", port=5003)
 
 if __name__ == "__main__":
-    print("""
-
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣶⡀
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣦
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⣷⡄
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣦⡀
- ⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⣿⣿⣷⣆
- ⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣷⡀
- ⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⢀⣻⣿⣿⣿⣿⣿⣿⣿⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀
- ⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡄
- ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
- ⣿⣿⣿⣿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠃
- ⣿⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠈⣽⣿⣿⣿⣿⣿⣿⣿⠟⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉
- ⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⡿⠁
- ⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿⣿⣿⡿⠏
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⠟⠁
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⡿⠋
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠟
- ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠁
-
-    """)
     lookup.check()
     start()

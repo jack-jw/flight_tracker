@@ -216,7 +216,9 @@ document.addEventListener("DOMContentLoaded", function() {
         attributionControl: false
     });
 
-    const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+    const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        detectRetina: true // not good for some of the maps
+    }).addTo(map);
     setTheme("satellite");
 
     map.on('click', function() {
@@ -300,10 +302,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
             setAircraft(individual);
 
+            let airlineLogoUrl = null;
+            if (!/\d/.test(individual.callsign.slice(0,3))) {
+                airlineLogoUrl = ' https://www.flightaware.com/images/airline_logos/180px/' + individual.callsign.slice(0,3) + '.png'
+            }
+
             const listItem = document.createElement('div');
             listItem.classList.add(`_${individual.icao24}`);
             listItem.innerHTML = `
-                <div class="aircraft-list-airline-logo" style="background-image: url(https://www.flightaware.com/images/airline_logos/180px/${individual.callsign.slice(0,3)}.png)">
+                <div class="aircraft-list-airline-logo" style="background-image: url(${airlineLogoUrl})">
                 </div>
 
                 <div>
@@ -316,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             <span style="transform: rotate(${individual.hdg}deg); position: absolute">&uarr;</span>
                         </span>
                         <span style="margin-left: 1em">
-                            ${individual.speed} KTS
+                            ${Math.round(individual.speed)} KTS
                         </span>
                     </div>
                 </div>
@@ -412,26 +419,29 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('flight-progress').value = null;
 
         document.getElementById('aircraft-reg').textContent = info.aircraft.reg;
-        document.getElementById('aircraft-reg-flag').className = 'fi fis fi-' + info.aircraft.country.toLowerCase();
+        document.getElementById('aircraft-reg-flag').style.backgroundImage = 'url(/image/flag/' + info.aircraft.country + ')';
         document.getElementById('aircraft-type').textContent = info.aircraft.type;
 
-        document.getElementById('aircraft-speed').textContent = selection.speed;
+        document.getElementById('aircraft-hdg').textContent = Math.round(selection.hdg) + 'º';
+        document.getElementById('aircraft-hdg-compass').style.transform = 'rotate(' + selection.hdg + 'deg)';
+
+        document.getElementById('aircraft-speed').textContent = Math.round(selection.speed);
         const speedBounded = Math.max(0, Math.min((selection.speed/600), 1));
         const dashoffset = 188.4 - (speedBounded * 188.4);
         document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = dashoffset;
 
-        document.getElementById("origin-input").addEventListener("input", function() {
+        document.getElementById('origin-input').addEventListener('input', function() {
             if (this.value.length == 3) {
-                socket.emit("lookup.airport", this.value, 'origin');
+                socket.emit('lookup.airport', this.value, 'origin');
                 document.getElementById('destination-input').focus();
             } else {
                 document.getElementById('aircraft-route-origin').innerHTML = 'Origin';
             }
         });
 
-        document.getElementById("destination-input").addEventListener("input", function() {
+        document.getElementById('destination-input').addEventListener('input', function() {
             if (this.value.length == 3) {
-                socket.emit("lookup.airport", this.value, 'destination');
+                socket.emit('lookup.airport', this.value, 'destination');
                 document.getElementById('destination-input').blur()
             } else {
                 document.getElementById('aircraft-route-destination').innerHTML = 'Destination';

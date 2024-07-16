@@ -131,7 +131,7 @@ def _get_row(table, search_column, query):
 
     db_path = _INSTANCE_DATABASE if table == "routes" else _DATABASE
     check_thread = table == "routes"
-    db = sqlite3.connect(db_path, check_same_thread=check_thread)
+    db = sqlite3.connect(db_path)
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
 

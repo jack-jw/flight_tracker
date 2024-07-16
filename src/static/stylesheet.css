@@ -1,21 +1,5 @@
 /* static/global.css */
 
-@font-face {
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: block;
-    src: url('https://rsms.me/inter/font-files/InterVariable.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: Inter;
-    font-style: italic;
-    font-weight: 100 900;
-    font-display: block;
-    src: url('https://rsms.me/inter/font-files/InterVariable-Italic.woff2') format('woff2');
-}
-
 :root {
     --default-fonts: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
     font-family: var(--default-fonts);
@@ -106,6 +90,10 @@ body {
 
 #main-container-main-view, #main-container-aircraft-view {
     height: 100%;
+}
+
+#main-container-aircraft-view {
+    overflow: scroll;
 }
 
 #main-container-main-view {
@@ -257,7 +245,7 @@ body {
     display: none;
 }
 
-.aircraft-list-airline-logo, #aircraft-airline-logo, .my-flights-rank-icon {
+.flag, .aircraft-list-airline-logo, #aircraft-airline-logo, .my-flights-rank-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -306,10 +294,12 @@ body {
 }
 
 #aircraft-airline-callsign {
-    position: relative;
+/*    position: -webkit-sticky;*/
+    position: sticky;
     padding-bottom: 5px;
     height: 2ch;
     padding-top: 15px;
+    top: 0;
 }
 
 #aircraft-airline-logo {
@@ -358,6 +348,7 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    z-index: 2;
 }
 
 #info {
@@ -499,10 +490,15 @@ hr {
     z-index: 2;
 }
 
-.fis {
+.flag {
     border-radius: 50%;
-    position: absolute;
+    display: inline-block;
+    height: 1em;
+}
+
+#aircraft-reg-flag {
     margin-top: 2px;
+    position: absolute;
 }
 
 #aircraft-reg {
@@ -584,7 +580,7 @@ a:hover {
 }
 
 .my-flights-title-container {
-    width: 730px;
+    width: 740px;
 }
 
 .my-flights-pre-title, .my-flights-rank-amount, .my-flights-alt-amount {
@@ -607,7 +603,7 @@ a:hover {
     margin-left: 64px;
 }
 
-#my-flights-country-count-flags .fis {
+#my-flights-country-count-flags .flag {
     position: relative;
     margin-right: 0.25em;
 }
@@ -660,7 +656,7 @@ a:hover {
     font-weight: bold;
 }
 
-.my-flights-airport-tooltip-title .fis {
+.my-flights-airport-tooltip-title .flag {
     position: absolute;
     left: 0.75em;
     margin-top: 0.25em;
@@ -691,7 +687,7 @@ a:hover {
 }
 
 #my-flights-continent-count {
-    margin: 24px;
+    margin-bottom: 24px;
 }
 
 .my-flights-rank-amount {
@@ -803,11 +799,12 @@ a:hover {
 }
 
 @media (max-width: 780px) {
-    .my-flights-container, .my-flights-title-container, .my-flights-parent {
+    .my-flights-container, .my-flights-parent {
         width: calc(100% - 20px);
     }
     .my-flights-title-container {
-        margin-left: 30px;
+        width: calc(100% - 30px);
+        margin-left: 10px;
     }
 }
 
