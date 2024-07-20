@@ -184,8 +184,6 @@ def _get_country_from_reg(reg):
     main_db.close()
     if result:
         result = result[0]
-    else:
-        result = "XX"
     return result
 
 # MARK: - Main functions
@@ -445,12 +443,9 @@ def aircraft(icao24):
     if result:
         if "reg" in result:
             result["country"] = _get_country_from_reg(result["reg"])
-        else:
-            result["country"] = "XX"
-
         return result
 
-    return {"icao24": icao24, "country": "XX"}
+    return {"icao24": icao24}
 
 def aircraft_icon(type):
     """

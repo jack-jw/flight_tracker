@@ -46,14 +46,15 @@ Hopefully eventually an ADSB decoder and web flight tracking interface
         * Metrics
             * ~~Speed in a dial~~
                 * Add colour to make it nicer?
-                * Change position?
-            * Vertical speed
-            * Altitude - how to represent nicely?
-            * Heading - nice compass design?
+                * ~~Change position?~~
+            * ~~Vertical speed~~
+            * ~~Altitude - how to represent nicely?~~
+            * ~~Heading - nice compass design?~~
+                * Change smooth circle to ticks like an actual compass?
     * Other detail pages? e.g. airlines, airports, aircraft? universal lookup function?
     * Personal flight log page
     * Preferences page
-        * Potential preferences: map theme (already implemented in JS but not visibly), plane pictures and airline icons sources, caching options, internet free mode?, possibly also local system settings (if run on RPi etc.)
+        * Potential preferences: map theme (already implemented in JS but not visibly), theme colour, font disambiguation, units, use of IATA or ICAO codes for airlines and airports, plane pictures and airline icons sources, caching options, internet free mode?, possibly also local system settings (if run on RPi etc.)
     * Design
         * ~~Implement dark mode~~
             * ~~Make dark mode for the OSM map by inverting and then rotating the hue~~

@@ -3,7 +3,7 @@
 :root {
     --default-fonts: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
     font-family: var(--default-fonts);
-    font-feature-settings: 'liga' 1, 'calt' 1;
+    font-feature-settings: 'liga' 1, 'calt' 1/*, 'ss04' 1*/; /* ss04 for disambiguation */
     --colour: black;
     --background-colour: rgba(247, 247, 246, 0.9);
     --control-colour: rgba(189, 189, 191, 1);
@@ -245,7 +245,7 @@ body {
     display: none;
 }
 
-.flag, .aircraft-list-airline-logo, #aircraft-airline-logo, .my-flights-rank-icon {
+.flag, .aircraft-list-airline-logo, .my-flights-rank-icon {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -293,8 +293,13 @@ body {
     display: none; /* for now until I sort out the layout */
 }
 
+#aircraft-route-origin, #aircraft-route-destination, #aircraft-airline-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 #aircraft-airline-callsign {
-/*    position: -webkit-sticky;*/
     position: sticky;
     padding-bottom: 5px;
     height: 2ch;
@@ -304,12 +309,18 @@ body {
 
 #aircraft-airline-logo {
     height: 2ch;
-    position: absolute;
+    width: 2ch;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+#aircraft-airline-logo:not([src]) {
+    display: none;
 }
 
 #aircraft-airline-name {
-    position: absolute;
-    margin-left: 3ch;
+    display: inline-block;
+    width: calc(100% - 2.25ch)
 }
 
 #aircraft-callsign {
@@ -321,13 +332,11 @@ body {
 #aircraft-route-origin, #aircraft-route-destination {
     position: absolute;
     color: grey;
-}
-
-#aircraft-route-origin {
-    left: 0;
+    width: calc(50% - 10px);
 }
 
 #aircraft-route-destination {
+    text-align: right;
     right: 0;
 }
 
@@ -401,8 +410,9 @@ hr {
     transition: background-color 0.1s ease-out, padding 0.1s ease-out;
     outline: none;
     border: none;
-    font-family: var(--default-fonts);
-    color: var(--colour);
+    font-family: inherit;
+    font-feature-settings: inherit;
+    color: inherit;
     padding: 1px 5px;
 }
 
@@ -419,7 +429,7 @@ hr {
 }
 
 .iata-input::placeholder {
-    color: var(--colour);
+    color: inherit;
 }
 
 .iata-input:focus::placeholder {
@@ -455,7 +465,6 @@ hr {
 
 #flight-progress::-webkit-progress-bar {
     background-color: var(--hover-colour);
-    box-shadow: inset 0 0 1px 0.2px rgba(0, 0, 0, 0.1);
     border-radius: 3px;
 }
 
@@ -497,12 +506,13 @@ hr {
 }
 
 #aircraft-reg-flag {
-    margin-top: 2px;
-    position: absolute;
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: -2px;
 }
 
 #aircraft-reg {
-    margin-left: 2.25ch;
+    display: inline-block;
 }
 
 a, a:hover, a:active, a:visited {
@@ -515,14 +525,22 @@ a:hover {
     text-decoration: underline;
 }
 
+#metre-container {
+    position: relative;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7.5px;
+}
+
 .metre {
     stroke-linecap: round;
-    display: block;
-    margin: auto;
+    height: 60px;
 }
 
 .metre text {
-    fill: var(--colour)
+    fill: var(--colour);
 }
 
 .metre-value {
@@ -533,6 +551,11 @@ a:hover {
 .metre-unit {
     font-weight: 600;
     font-size: 16px;
+}
+
+#aircraft-vspeed-indicator {
+    font-weight: 100;
+    font-size: 24px;
 }
 
 #my-flights-body {

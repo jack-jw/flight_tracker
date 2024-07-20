@@ -293,6 +293,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     })
                 }).addTo(map);
 
+                individual.marker.setZIndexOffset(individual.alt);
+
                 individual.marker.getElement().classList.add(`_${individual.icao24}`);
                 individual.marker.getElement().setAttribute('tabindex', '-1');
             }
@@ -366,6 +368,14 @@ document.addEventListener("DOMContentLoaded", function() {
         socket.emit("lookup.all", urlIcao24, urlCallsign);
     }
 
+
+    document.getElementById('aircraft-airline-logo').onload = function() {
+        document.getElementById('aircraft-airline-logo').style.display = null;
+    };
+    document.getElementById('aircraft-airline-logo').onerror = function() {
+        document.getElementById('aircraft-airline-logo').style.display = 'none';
+    };
+
     socket.on('lookup.all', function(response) {
         document.getElementById('aircraft-img').style.display = 'none'
         info = response;
@@ -403,11 +413,11 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('main-container-main-view').style.display = 'none';
         aircraftView = document.getElementById('main-container-aircraft-view');
 
-        document.getElementById('aircraft-img').src = '/image/aircraft/' + info.aircraft.reg;
-        document.getElementById('aircraft-airline-logo').style.backgroundImage = 'url(https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png)';
-        document.getElementById('aircraft-airline-name').textContent = info.airline.name.replace('International', "Int'l");
+        document.getElementById('aircraft-img').src = '/image/aircraft/' + (info.aircraft.reg ?? 'placeholder');
+        document.getElementById('aircraft-airline-logo').src = 'https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png';
+        document.getElementById('aircraft-airline-name').textContent = (info.airline.name ?? '').replace('International', "Int'l");
         document.getElementById('aircraft-callsign').textContent = info.callsign;
-        document.getElementById('aircraft-callsign').title = info.radio;
+        document.getElementById('aircraft-callsign').title = info.radio ?? '';
         document.getElementById('aircraft-route-origin').textContent = info.origin.muni;
         document.getElementById('aircraft-route-destination').textContent = info.destination.muni;
 
@@ -419,16 +429,46 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('flight-progress').value = null;
 
         document.getElementById('aircraft-reg').textContent = info.aircraft.reg;
-        document.getElementById('aircraft-reg-flag').style.backgroundImage = 'url(/image/flag/' + info.aircraft.country + ')';
+        if (info.aircraft.country) {
+            document.getElementById('aircraft-reg-flag').style.backgroundImage = 'url(/image/flag/' + info.aircraft.country + ')';
+            document.getElementById('aircraft-reg-flag').style.display = null;
+        } else {
+            document.getElementById('aircraft-reg-flag').style.display = 'none';
+        }
         document.getElementById('aircraft-type').textContent = info.aircraft.type;
+        if (info.aircraft.reg || info.aircraft.country || info.aircraft.type) {
+            document.getElementById('aircraft-type').parentNode.style.display = null;
+        } else {
+            document.getElementById('aircraft-type').parentNode.style.display = 'none';
+        }
 
         document.getElementById('aircraft-hdg').textContent = Math.round(selection.hdg) + 'º';
-        document.getElementById('aircraft-hdg-compass').style.transform = 'rotate(' + selection.hdg + 'deg)';
+        document.getElementById('aircraft-hdg-indicator').style.transform = 'rotate(' + selection.hdg + 'deg)';
 
         document.getElementById('aircraft-speed').textContent = Math.round(selection.speed);
         const speedBounded = Math.max(0, Math.min((selection.speed/600), 1));
         const dashoffset = 188.4 - (speedBounded * 188.4);
         document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = dashoffset;
+
+        document.getElementById('aircraft-vspeed').textContent = Math.round(Math.abs(selection.vspeed));
+        let indicator;
+        if (Math.round(selection.vspeed) > 0) {
+            indicator = '▲';
+        } else if (Math.round(selection.vspeed) === 0) {
+            indicator = '►';
+        } else if (Math.round(selection.vspeed) < 0) {
+            indicator = '▼';
+        }
+        document.getElementById('aircraft-vspeed-indicator').textContent = indicator;
+
+        if (selection.alt > 18000) { // can safely assume above the T. alt globally
+            document.getElementById('aircraft-alt-main').textContent = 'FL' + Math.floor(selection.alt/100);
+            document.getElementById('aircraft-alt-alt').textContent = Math.round(selection.alt) + ' FT';
+        } else {
+            document.getElementById('aircraft-alt-main').textContent = Math.round(selection.alt);
+            document.getElementById('aircraft-alt-alt').textContent = 'FT';
+        }
+        document.getElementById('aircraft-alt-indicator').setAttribute('y1', 87.5 - (selection.alt/41000) * 75);
 
         document.getElementById('origin-input').addEventListener('input', function() {
             if (this.value.length == 3) {

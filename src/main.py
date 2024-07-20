@@ -90,7 +90,7 @@ def start():
     def serve_aircraft_image(tail):
         placeholder = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAA"
                                 "AAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
-        if tail in ("Unknown Reg", "placeholder"):
+        if tail == "placeholder":
             return placeholder, 200, {"Content-Type": "image/png"}
 
         if exists(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg"):
@@ -150,21 +150,19 @@ def start():
             info["radio"] = info["airline"]["radio"]
             for char in callsign[3:]:
                 info["radio"] += " " + nato[char]
-        else:
-            info["radio"] = ""
 
         if "name" not in info["airline"]:
-            if "operator" in info["aircraft"]:
-                info["airline"]["name"] = info["aircraft"]["operator"]
-            elif "owner" in info["aircraft"]:
-                info["airline"]["name"] = info["aircraft"]["owner"]
-            else:
-                info["airline"]["name"] = "Unknown Airline"
+            if "operatoricao" in info["aircraft"]:
+                airline = lookup.airline(info["aircraft"]["operatoricao"])
+                if "name" in "airline":
+                    info["airline"]["name"] = airline["name"]
 
-        if "type" not in info["aircraft"]:
-            info["aircraft"]["type"] = "Unknown Type"
-        if "reg" not in info["aircraft"]:
-            info["aircraft"]["reg"] = "Unknown Reg"
+            # structure this better?
+            if "name" not in info["airline"]:
+                if "operator" in info["aircraft"]:
+                    info["airline"]["name"] = info["aircraft"]["operator"]
+                elif "owner" in info["aircraft"]:
+                    info["airline"]["name"] = info["aircraft"]["owner"]
 
         route = lookup.route(callsign)
         if route:

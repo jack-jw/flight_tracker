@@ -54,6 +54,10 @@
         .metre-progress {
             stroke: {{ colour }};
         }
+
+        #aircraft-vspeed-indicator {
+            fill: {{ colour }};
+        }
     </style>
 </head>
 <body>
@@ -67,11 +71,11 @@
 
             <div id="aircraft-info">
                 <div id="aircraft-airline-callsign">
-                    <div>
-                        <div id="aircraft-airline-logo"></div>
+                    <div id="aircraft-callsign"></div>
+                    <div style="position: absolute; width: calc(100% - 5.5em); white-space: nowrap;">
+                        <img id="aircraft-airline-logo"></img>
                         <div id="aircraft-airline-name"></div>
                     </div>
-                    <div id="aircraft-callsign"></div>
                 </div>
                 <hr>
                 <div style="position: relative; height: 2ch; padding: 7.5px 0 0">
@@ -91,7 +95,7 @@
 
                 <progress id="flight-progress" value="0"></progress>
 
-                <div style="position: relative; height: 2ch; padding-top: 15px">
+                <div style="position: relative; height: 2ch; margin: 15px 0;">
                     <div style="position: absolute; left: 0">
                         <div id="aircraft-reg-flag" class="flag"></div>
                         <div id="aircraft-reg"></div>
@@ -100,39 +104,39 @@
                     <div id="aircraft-type" style="position: absolute; right: 0"></div>
                 </div>
 
-                <div style="position: relative; width: 100%; aspect-ratio: 4; padding-top: 15px">
+                <div id="metre-container">
+                    <svg viewBox="0 0 100 100" class="metre">
+                        <circle cx="50" cy="50" r="40" stroke="var(--hover-colour)" stroke-width="10px" fill="none"/>
+                        <text id="aircraft-hdg" x="51%" y="57%" text-anchor="middle" class="metre-value" style="font-size: 22px;"></text>
+                        <g id="aircraft-hdg-indicator" style="transform-origin: center; ">
+                            <g style="transform: translate(40.75px, 5px);">
+                                <rect fill="none" width="18.5" height="90"/>
+                                <path fill="{{ colour }}" d="M8.13,1.67L.55,12.89c-.66.98.04,2.3,1.22,2.3h15.16c1.18,0,1.89-1.32,1.22-2.3L10.58,1.67c-.59-.87-1.86-.87-2.45,0Z"/>
+                            </g>
+                        </g>
+                    </svg>
+                    <svg viewBox="0 7.5 100 100" class="metre">
+                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)" stroke-width="10"/>
 
-                    <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 2;">
+                        <text id="aircraft-speed" x="50" y="70" text-anchor="middle" class="metre-value"></text>
+                        <text x="50" y="90" text-anchor="middle" class="metre-unit">KTS</text>
 
-                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); aspect-ratio: 1;">
-                            <svg width="100%" height="100%" viewBox="0 0 100 100" class="metre">
-                                <circle cx="50" cy="50" r="40" stroke="var(--hover-colour)" stroke-width="10px" fill="none"/>
-                                <text id="aircraft-hdg" x="51%" y="57%" text-anchor="middle" class="metre-value" style="font-size: 22px;"></text>
-                                <g id="aircraft-hdg-compass" style="transform-origin: center; ">
-                                    <g style="transform: translate(40.75px, 5px);">
-                                        <rect fill="none" width="18.5" height="90"/>
-                                        <path fill="{{ colour }}" d="M8.13,1.67L.55,12.89c-.66.98.04,2.3,1.22,2.3h15.16c1.18,0,1.89-1.32,1.22-2.3L10.58,1.67c-.59-.87-1.86-.87-2.45,0Z"/>
-                                    </g>
-                                </g>
-                            </svg>
-                        </div>
-
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); aspect-ratio: 1;">
-                            <svg width="100%" height="100%" viewBox="0 7.5 100 100" class="metre">
-                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)" stroke-width="10"/>
-
-                                <text id="aircraft-speed" x="50%" y="70%" text-anchor="middle" class="metre-value"></text>
-                                <text x="50%" y="90%" text-anchor="middle" class="metre-unit">KTS</text>
-
-                                <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="aircraft-speed-indicator"/>
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div style="position: absolute; right: 0; width: calc(50% - 7.5px); aspect-ratio: 2;">
-                        <div style="position: absolute; left: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px;"></div>
-                        <div style="position: absolute; right: 0; width: calc(50% - 7.5px); background-color: var(--hover-colour); aspect-ratio: 1; border-radius: 10px;"></div>
-                    </div>
+                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke-width="10" stroke-dasharray="188.4,251.2" stroke-dashoffset="188.4" class="metre-progress" id="aircraft-speed-indicator"/>
+                    </svg>
+                    <svg viewBox="0 0 100 100" class="metre">
+                        <text x="50" y="55" text-anchor="middle" class="metre-value">
+                            <tspan id="aircraft-vspeed-indicator"></tspan>
+                            <tspan id="aircraft-vspeed"></tspan>
+                        </text>
+                        <text x="50" y="75" text-anchor="middle" class="metre-unit">FT/MIN</text>
+                    </svg>
+                    <svg viewBox="0 0 125 100" class="metre">
+                        <text id="aircraft-alt-main" x="95" y="55" text-anchor="end" class="metre-value">
+                        </text>
+                        <text id="aircraft-alt-alt" x="95" y="75" text-anchor="end" class="metre-unit"></text>
+                        <line x1="115" x2="115" y1="12.5" y2="87.5" fill="none" stroke="var(--hover-colour)" stroke-width="10"/>
+                        <line x1="115" x2="115" y2="87.5" fill="none" stroke-width="10" class="metre-progress" id="aircraft-alt-indicator"/>
+                    </svg>
                 </div>
             </div>
         </div>
