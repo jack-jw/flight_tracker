@@ -3,19 +3,21 @@
 
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>My Flights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
     <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)"/>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='leaflet.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='bg-icon.jpeg') }}"/>
+    <link rel="icon" href="{{ url_for('static', filename='icon.jpeg') }}"/>
 
-    <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='leaflet.js') }}"></script>
     <script src="{{ url_for('static', filename='my_flights.js') }}"></script>
+    <script>const myFlights = {{ my_flights | tojson }}</script>
+
     <style>
         @font-face {
             font-family: Inter;
@@ -35,6 +37,9 @@
     </style>
 </head>
 <body>
+    <div id="aircraft-icons-sprite-wrapper">
+        {{ aircraft_icons | safe }}
+    </div>
     <div id="map"></div>
     <div id="my-flights-body">
         <div class="my-flights-title-container">

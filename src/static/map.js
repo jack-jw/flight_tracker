@@ -1,86 +1,79 @@
 // static/map.js
 
-//document.addEventListener("visibilitychange", function() {
+//document.addEventListener('visibilitychange', function() {
 //    if (!document.hidden) {
 //        location.reload()
 //        // to prevent glitching of animations, not the best implementation
-//    }
+//    };
 //});
 
-document.addEventListener("DOMContentLoaded", function() {
-    let selection = null, info = null, polylines = null;
+document.addEventListener('DOMContentLoaded', function() {
+    let selection = null;
 
-    const socket = io();
-    socket.emit('decoder.get');
-    socket.on('disconnect', function() {
+    const socketio = io();
+    socketio.on('disconnect', function() {
         location.reload();
     });
 
     // MARK: - Container
 
-    const container = document.getElementById("main-container");
+    const container = document.getElementById('main-container');
 
     function setContainerDefaultScroll(scrollBehaviour) {
-        let scrollPosition;
-        if (window.innerWidth > 500) {
-            scrollPosition = document.body.scrollHeight;
-        } else {
+        if (window.innerWidth <= 500) {
             const containerTop = container.getBoundingClientRect().top + window.pageYOffset;
-            scrollPosition = containerTop - (window.innerHeight - 335);
-        }
-
-        window.scrollTo({
-            top: scrollPosition,
-            left: 0,
-            behavior: scrollBehaviour
-        });
-    }
+            const scrollPosition = containerTop - (window.innerHeight - 335);
+            window.scrollTo({
+                top: scrollPosition,
+                left: 0,
+                behavior: scrollBehaviour
+            });
+        };
+    };
     setContainerDefaultScroll('instant');
 
     // MARK: - Map
 
     function clearMap() {
-        map.eachLayer(function(layer) {
-            if (layer instanceof L.Polyline) { map.removeLayer(layer); }
-        });
+        try { map.removeLayer(selection.polylines.orig.line); } catch {};
+        try { map.removeLayer(selection.polylines.dest.line); } catch {};
 
-        Object.values(aircraft).forEach(function(aircraft) {
-            try {
-                aircraft.marker.getElement().style.opacity = null;
-            } catch {}
+        Object.values(aircraft).forEach(function(each) {
+            each.marker.getElement().style.opacity = '';
         });
 
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
         params.delete('callsign');
-        params.delete('icao24');
+        params.delete('icao');
         url.search = params.toString();
         history.pushState({}, '', url.toString());
 
         document.getElementById('origin-input').outerHTML = document.getElementById('origin-input').outerHTML;
         document.getElementById('destination-input').outerHTML = document.getElementById('destination-input').outerHTML;
-        document.getElementById('aircraft-img').src = "/image/aircraft/placeholder";
+        document.getElementById('aircraft-img').src = '';
 
-        selection = info = polylines = null;
-        document.getElementById('main-container-main-view').style.display = null;
-        document.getElementById('main-container-aircraft-view').style.display = "none";
-    }
+        document.getElementById('main-container-main-view').style.display = '';
+        document.getElementById('main-container-aircraft-view').style.display = 'none';
 
-    function setAircraft(anAircraft) {
-        const marker = anAircraft.marker;
+        selection = null;
+    };
+
+    function set(i) {
+        const marker = i.marker;
 
         const markerElement = marker.getElement();
-        const markerElementInner = markerElement.querySelector('img');
+        const markerElementInner = markerElement.firstElementChild;
         markerElementInner.style.transition = 'transform 0.5s ease';
-        markerElementInner.style.transform = 'rotate(' + anAircraft.hdg + 'deg)';
+        markerElementInner.style.transform = 'rotate(' + i.hdg + 'deg)';
 
-        const speed = anAircraft.speed / (1.944 * 5);
+        const speed = i.speed / (1.944 * 5);
 
         if (marker.moveInterval) {
             clearInterval(marker.moveInterval);
-        }
+        };
 
-        const radianAngle = anAircraft.hdg * (Math.PI / 180);
+        const radianAngle = i.hdg * (Math.PI / 180);
 
         function fly() {
             const changeInLat = Math.cos(radianAngle) * (speed / 111111);
@@ -89,15 +82,15 @@ document.addEventListener("DOMContentLoaded", function() {
             const newLatLng = {
                 lat: currentLatLng.lat + changeInLat,
                 lng: currentLatLng.lng + changeInLng
-            }
+            };
             marker.setLatLng(newLatLng);
-            if (selection !== null && polylines !== null && selection.icao24 === polylines.icao24) {
+            if (selection !== null) {
                 plotRoutes();
-            }
-        }
+            };
+        };
 
         marker.moveInterval = setInterval(fly, 100);
-    }
+    };
 
     function plotRoutes() {
         function plotGreatCircleRoute(startPoint, endPoint, opacity) {
@@ -115,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
                 const lng = Math.atan2(y, x) * 180 / Math.PI;
                 return [lat, lng];
-            }
+            };
 
             function computeGreatCircleDistance(start, end) {
                 const R = 6371e3;
@@ -125,13 +118,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 const lng2 = end.lng * Math.PI / 180;
                 const deltaLat = lat2 - lat1;
                 const deltalng = lng2 - lng1;
-                const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-                Math.cos(lat1) * Math.cos(lat2) *
-                Math.sin(deltalng / 2) * Math.sin(deltalng / 2);
+                const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltalng / 2) * Math.sin(deltalng / 2);
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 const distance = R * c;
                 return distance;
-            }
+            };
 
             const startLatLng = L.latLng(startPoint);
             const endLatLng = L.latLng(endPoint);
@@ -141,71 +132,69 @@ document.addEventListener("DOMContentLoaded", function() {
                 const ratio = i / 100;
                 const intermediatePoint = computeIntermediatePoint(startLatLng, endLatLng, ratio);
                 curvePoints.push(intermediatePoint);
-            }
+            };
 
             const line = L.polyline(curvePoints, { color: '#FF9500', weight: 2, opacity: opacity }).addTo(map);
             line.getElement().setAttribute('tabindex', '-1');
             const distance = computeGreatCircleDistance(startLatLng, endLatLng);
-            return {'line': line, 'distance': distance};
-        }
+            return {'line': line, 'dist': distance};
+        };
 
-        try { map.removeLayer(polylines.origin.line); } catch {};
-        try { map.removeLayer(polylines.destination.line); } catch {};
+        try { map.removeLayer(selection.polylines.orig.line); } catch {};
+        try { map.removeLayer(selection.polylines.dest.line); } catch {};
 
-        let fromOrigin, toDestination;
+        selection.polylines = {};
         let percentage = 0;
 
-        if (typeof info.origin.lat !== 'undefined' && typeof info.origin.lng !== 'undefined') {
-            fromOrigin = plotGreatCircleRoute([info.origin.lat, info.origin.lng], selection.marker.getLatLng(), 1);
-        }
+        if (typeof selection.orig.lat !== 'undefined' && typeof selection.orig.lng !== 'undefined') {
+            selection.polylines.orig = plotGreatCircleRoute(selection.orig, selection.marker.getLatLng(), 1);
+        };
 
-        if (typeof info.destination.lat !== 'undefined' && typeof info.destination.lng !== 'undefined') {
-            toDestination = plotGreatCircleRoute(selection.marker.getLatLng(), [info.destination.lat, info.destination.lng], 0.5);
-        }
+        if (typeof selection.dest.lat !== 'undefined' && typeof selection.dest.lng !== 'undefined') {
+            selection.polylines.dest = plotGreatCircleRoute(selection.dest, selection.marker.getLatLng(), 0.5);
+        };
 
-        if (typeof fromOrigin !== 'undefined' && typeof toDestination !== 'undefined') {
-            percentage = fromOrigin.distance / (fromOrigin.distance + toDestination.distance);
+        if (selection.polylines.orig && selection.polylines.dest) {
+            percentage = selection.polylines.orig.dist / (selection.polylines.orig.dist + selection.polylines.dest.dist);
             document.getElementById('flight-progress').value = percentage;
-        }
-
-        polylines = {'origin': fromOrigin, 'destination': toDestination, 'percentage': percentage, 'icao24': selection.icao24};
-    }
+        };
+    };
 
     function setTheme(themeName) {
         let tileLayerURL;
         let credit;
         switch (themeName) {
-                case 'standard':
-                    tileLayerURL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
-                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © Humanitarian OpenStreetMap Team (HOT)';
-                    document.querySelector('.leaflet-tile-pane').style.filter = null;
-                    break;
-                case 'osm':
-                    tileLayerURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                    credit = 'Map data © OpenStreetMap contributors'
-                    document.querySelector('.leaflet-tile-pane').style.filter = null;
-                    break;
-                case 'watercolour':
-                    tileLayerURL = 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg';
-                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © Stamen Design';
-                    document.querySelector('.leaflet-tile-pane').style.filter = 'none';
-                    break;
-                case 'satellite':
-                    tileLayerURL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-                    credit = 'Map data © Esri, World Imagery'
-                    document.querySelector('.leaflet-tile-pane').style.filter = 'none';
-                    break;
-                case 'atc':
-                    tileLayerURL = 'https://data2.geo-fs.com/osm/{z}/{x}/{y}.png'
-                    credit = 'Map data © OpenStreetMap contributors<br>Tiles © GeoFS'
-                    document.querySelector('.leaflet-tile-pane').style.filter = null;
-                    break;
-                default:
-                    return;
-        }
+            case 'standard':
+                tileLayerURL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+                credit = 'Map data © OpenStreetMap contributors<br>Tiles © Humanitarian OpenStreetMap Team (HOT)';
+                document.querySelector('.leaflet-tile-pane').style.filter = '';
+                break;
+            case 'osm':
+                tileLayerURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                credit = 'Map data © OpenStreetMap contributors'
+                document.querySelector('.leaflet-tile-pane').style.filter = '';
+                break;
+            case 'watercolour':
+                tileLayerURL = 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg';
+                credit = 'Map data © OpenStreetMap contributors<br>Tiles © Stamen Design';
+                document.querySelector('.leaflet-tile-pane').style.filter = 'none';
+                break;
+            case 'satellite':
+                tileLayerURL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+                credit = 'Map data © Esri, World Imagery'
+                document.querySelector('.leaflet-tile-pane').style.filter = 'none';
+                break;
+            case 'atc':
+                tileLayerURL = 'https://data2.geo-fs.com/osm/{z}/{x}/{y}.png'
+                credit = 'Map data © OpenStreetMap contributors<br>Tiles © GeoFS'
+                document.querySelector('.leaflet-tile-pane').style.filter = '';
+                break;
+            default:
+                return;
+        };
         tileLayer.setUrl(tileLayerURL);
         document.getElementById('aircraft-list-map-credit').innerHTML = credit;
-    }
+    };
 
     // MARK: Map definition
     const map = L.map('map', {
@@ -219,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         detectRetina: true // not good for some of the maps
     }).addTo(map);
-    setTheme("satellite");
+    setTheme('satellite');
 
     map.on('click', function() {
         if (window.innerWidth <= 500) {
@@ -228,9 +217,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 left: 0,
                 behavior: 'smooth'
             });
-        }
+        };
         clearMap();
     });
+
+    // MARK: - Aircraft list filter
+    const aircraftList = document.getElementById('aircraft-list');
 
     document.getElementById('aircraft-list-clear').addEventListener('click', function() {
         document.getElementById('aircraft-list-filter').value = '';
@@ -238,228 +230,232 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.getElementById('aircraft-list-filter').addEventListener('input', function() {
+        const visibleLatLngs = [];
         const filterValue = this.value.toUpperCase();
         if (filterValue !== '') {
             document.getElementById('aircraft-list-filter').style.width = 'calc(100% - 45px)'
             document.getElementById('pfp').classList.add('hidden');
             document.getElementById('aircraft-list-clear').classList.remove('hidden');
         } else {
-            document.getElementById('aircraft-list-filter').style.width = null;
+            document.getElementById('aircraft-list-filter').style.width = '';
             document.getElementById('aircraft-list-clear').classList.add('hidden');
             document.getElementById('pfp').classList.remove('hidden');
-        }
+        };
 
-        const aircraftList = document.getElementById('aircraft-list').children;
-        Array.from(aircraftList).forEach(item => {
+        Array.from(aircraftList.children).forEach(item => {
             if (item.tagName === 'DIV') {
-                const icao24 = item.className.substring(1);
+                const icao = item.className.substring(1);
                 if (item.textContent.includes(filterValue)) {
-                    item.style.display = null;
-                    aircraft[icao24].marker.getElement().style.display = null
+                    item.style.display = '';
+                    visibleLatLngs.push(aircraft[icao].marker.getLatLng());
+                    aircraft[icao].marker.getElement().style.display = '';
                 } else {
                     item.style.display = 'none';
-                    aircraft[icao24].marker.getElement().style.display = 'none'
-                }
+                    aircraft[icao].marker.getElement().style.display = 'none';
+                };
             } else if (filterValue === '') {
-                item.style.display = null;
+                item.style.display = '';
             } else {
                 item.style.display = 'none';
-            }
+            };
         });
+        map.fitBounds(L.latLngBounds(visibleLatLngs));
     });
 
     // MARK: - Aircraft
     let aircraft = {};
-    let aircraftCount = 0;
-    const aircraftList = document.getElementById('aircraft-list');
 
-    socket.on('decoder.get', function(payload) {
-        oldAircraft = { ...aircraft };
+    socketio.on('aircraft', function(payload) {
         aircraft = {
             ...aircraft,
             ...payload
         };
-        for (const key in aircraft) {
-            const individual = aircraft[key];
-            aircraftCount++
 
-            if (typeof oldAircraft[key] === 'undefined') {
+        Object.values(aircraft).forEach(function(i) {
+            i.marker = L.marker([i.lat, i.lng], {
+                icon: L.divIcon({
+                    className: 'aircraft-icon',
+                    html: '<svg><use href="#' + i.icon.icon +'"></use></svg>',
+                    iconSize: [i.icon.size, i.icon.size]
+                })
+            }).addTo(map);
 
-                individual.marker = L.marker([individual.lat, individual.lng], {
-                    icon: L.divIcon({
-                        className: 'aircraft-icon',
-                        html: `<img src="/image/icon/${individual.icon.icon}"/>`,
-                        iconSize: [individual.icon.size, individual.icon.size]
-                    })
-                }).addTo(map);
+            i.marker.setZIndexOffset(i.alt);
+            i.marker.getElement().setAttribute('tabindex', '-1');
 
-                individual.marker.setZIndexOffset(individual.alt);
+            set(i);
 
-                individual.marker.getElement().classList.add(`_${individual.icao24}`);
-                individual.marker.getElement().setAttribute('tabindex', '-1');
-            }
+            let airlineLogo = '';
+            if (!/\d/.test(i.csign.slice(0,3))) {
+                airlineLogo = 'background-image: url(https://www.flightaware.com/images/airline_logos/180px/' + i.csign.slice(0,3) + '.png)'
+            };
 
-            if (individual.type === null) { individual.type = '' }
-            if (individual.reg === null) { individual.reg = '' }
-
-            setAircraft(individual);
-
-            let airlineLogoUrl = null;
-            if (!/\d/.test(individual.callsign.slice(0,3))) {
-                airlineLogoUrl = ' https://www.flightaware.com/images/airline_logos/180px/' + individual.callsign.slice(0,3) + '.png'
-            }
-
-            const listItem = document.createElement('div');
-            listItem.classList.add(`_${individual.icao24}`);
-            listItem.innerHTML = `
-                <div class="aircraft-list-airline-logo" style="background-image: url(${airlineLogoUrl})">
+            i.listItem = document.createElement('div');
+            i.listItem.innerHTML = `
+                <div class="aircraft-list-airline-logo" style="${airlineLogo}">
                 </div>
 
                 <div>
-                    <div class="aircraft-list-callsign">${individual.callsign}</div>
+                    <div class="aircraft-list-callsign">${i.csign}</div>
                     <div class="aircraft-list-metrics">
-                        <b>${individual.reg}</b> ${individual.type}
+                        <b>${i.reg ?? ''}</b> ${i.type ?? ''}
                     </div>
                     <div class="aircraft-list-metrics">
                         <span style="width: 1em; height: 1em">
-                            <span style="transform: rotate(${individual.hdg}deg); position: absolute">&uarr;</span>
+                            <span style="transform: rotate(${i.hdg}deg); position: absolute">&uarr;</span>
                         </span>
                         <span style="margin-left: 1em">
-                            ${Math.round(individual.speed)} KTS
+                            ${Math.round(i.speed)} KTS
                         </span>
                     </div>
                 </div>
             `;
 
-            aircraftList.appendChild(listItem);
+            aircraftList.appendChild(i.listItem);
 
-            [listItem, individual.marker.getElement()].forEach(element => {
+            [i.listItem, i.marker.getElement()].forEach(element => {
                 element.addEventListener('click', function(event) {
-                    socket.emit("lookup.all", individual.icao24, individual.callsign);
+                    socketio.emit('select', i.icao, i.csign);
                     event.stopPropagation();
                 }, true);
+                element.classList.add('_' + i.icao);
             });
 
-            individual.marker.addEventListener('mouseover', function(event) {
-                if (window.innerWidth >= 500 && !window.matchMedia("(pointer: coarse)").matches) {
-                    listItem.scrollIntoView({ behaviour: 'smooth' });
-                    listItem.setAttribute('id', 'aircraft-list-div-hover')
-                }
+            i.marker.addEventListener('mouseover', function(event) {
+                if (window.innerWidth >= 500 && !window.matchMedia('(pointer: coarse)').matches) {
+                    i.listItem.scrollIntoView({ behaviour: 'smooth' });
+                    i.listItem.setAttribute('id', 'aircraft-list-div-hover');
+                };
             });
 
-            individual.marker.addEventListener('mouseout', function(event) {
-                if (window.innerWidth >= 500 && !window.matchMedia("(pointer: coarse)").matches) {
-                    listItem.scrollIntoView({ behaviour: 'smooth' });
-                    listItem.setAttribute('id', null)
-                }
+            i.marker.addEventListener('mouseout', function(event) {
+                if (window.innerWidth >= 500 && !window.matchMedia('(pointer: coarse)').matches) {
+                    i.listItem.setAttribute('id', '');
+                };
             });
-        }
+        });
 
         const countElement = document.createElement('footer');
-        countElement.setAttribute('id', 'aircraft-list-count')
-        countElement.innerHTML = `${aircraftCount} aircraft`;
+        countElement.setAttribute('id', 'aircraft-list-count');
+        countElement.innerHTML = Object.keys(aircraft).length + ' aircraft';
         aircraftList.appendChild(countElement);
     });
 
     // Check if an aircraft is selected in the URL
-    const urlIcao24 = new URLSearchParams(window.location.search).get('icao24');
-    const urlCallsign = new URLSearchParams(window.location.search).get('callsign');
-    if (urlCallsign !== null && urlIcao24 !== null && urlIcao24 in aircraft) {
-        socket.emit("lookup.all", urlIcao24, urlCallsign);
-    }
+    const urlIcao = new URLSearchParams(window.location.search).get('icao');
+    const urlCSign = new URLSearchParams(window.location.search).get('callsign');
+    if (urlCSign && urlIcao && urlIcao in aircraft) {
+        socketio.emit('select', urlIcao, urlCSign);
+    };
 
+    document.getElementById('aircraft-img').onload = function() {
+        document.getElementById('aircraft-img').style.display = '';
+    };
+    document.getElementById('aircraft-img').onerror = function() {
+        document.getElementById('aircraft-img').style.display = 'none';
+    };
 
     document.getElementById('aircraft-airline-logo').onload = function() {
-        document.getElementById('aircraft-airline-logo').style.display = null;
+        document.getElementById('aircraft-airline-logo').style.display = '';
     };
     document.getElementById('aircraft-airline-logo').onerror = function() {
         document.getElementById('aircraft-airline-logo').style.display = 'none';
     };
 
-    socket.on('lookup.all', function(response) {
-        document.getElementById('aircraft-img').style.display = 'none'
-        info = response;
+    socketio.on('select', function(response) {
+        document.getElementById('aircraft-img').src = ''
+        try { map.removeLayer(selection.polylines.orig.line); } catch {};
+        try { map.removeLayer(selection.polylines.dest.line); } catch {};
+
+        selection = {
+            ...aircraft[response.aircraft.icao],
+            ...response
+        };
 
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
         params.delete('callsign');
-        params.delete('icao24');
-        params.set('callsign', info.callsign);
-        params.set('icao24', info.aircraft.icao24);
+        params.delete('icao');
+        params.set('callsign', selection.csign);
+        params.set('icao', selection.icao);
         url.search = params.toString();
         history.pushState({}, '', url.toString());
 
-        if (!info.origin) {
-            info.origin = {};
-            info.origin.iata = '';
-            info.origin.muni = 'Origin';
-        }
+        if (!selection.orig) {
+            selection.orig = {};
+            selection.orig.iata = '';
+            selection.orig.muni = 'Origin';
+        };
 
-        if (!info.destination) {
-            info.destination = {};
-            info.destination.iata = '';
-            info.destination.muni = 'Destination';
-        }
+        if (!selection.dest) {
+            selection.dest = {};
+            selection.dest.iata = '';
+            selection.dest.muni = 'Destination';
+        };
 
-        selection = aircraft[info.aircraft.icao24];
-
-        Object.values(aircraft).forEach(function(aircraft) {
+        Object.values(aircraft).forEach(function(i) {
             try {
-                aircraft.marker.getElement().style.opacity = '50%';
-            } catch {}
+                i.marker.getElement().style.opacity = '50%';
+            } catch {};
         });
         selection.marker.getElement().style.opacity = '100%';
 
         document.getElementById('main-container-main-view').style.display = 'none';
-        aircraftView = document.getElementById('main-container-aircraft-view');
 
-        document.getElementById('aircraft-img').src = '/image/aircraft/' + (info.aircraft.reg ?? 'placeholder');
-        document.getElementById('aircraft-airline-logo').src = 'https://www.flightaware.com/images/airline_logos/180px/' + info.callsign.slice(0,3) + '.png';
-        document.getElementById('aircraft-airline-name').textContent = (info.airline.name ?? '').replace('International', "Int'l");
-        document.getElementById('aircraft-callsign').textContent = info.callsign;
-        document.getElementById('aircraft-callsign').title = info.radio ?? '';
-        document.getElementById('aircraft-route-origin').textContent = info.origin.muni;
-        document.getElementById('aircraft-route-destination').textContent = info.destination.muni;
+        document.getElementById('aircraft-img').src = selection.image.src;
+        if (selection.image.attr) {
+            document.getElementById('aircraft-img-shadow').title = '© ' + selection.image.attr;
+            // for now until I find a better way to credit!
+        } else {
+            document.getElementById('aircraft-img-shadow').title = '';
+        };
+        document.getElementById('aircraft-img-shadow').href = selection.image.link;
+        document.getElementById('aircraft-airline-logo').src = 'https://www.flightaware.com/images/airline_logos/180px/' + selection.csign.slice(0,3) + '.png';
+        document.getElementById('aircraft-airline-name').textContent = (selection.airline.name ?? '').replace('International', "Int'l");
+        document.getElementById('aircraft-callsign').textContent = selection.csign;
+        document.getElementById('aircraft-callsign').title = selection.radio ?? '';
+        document.getElementById('aircraft-route-origin').textContent = selection.orig.muni;
+        document.getElementById('aircraft-route-destination').textContent = selection.dest.muni;
 
-        document.getElementById('origin-input').placeholder = info.origin.iata;
-        document.getElementById('origin-input').value = null;
-        document.getElementById('destination-input').placeholder = info.destination.iata;
-        document.getElementById('destination-input').value = null;
+        document.getElementById('origin-input').placeholder = selection.orig.iata;
+        document.getElementById('origin-input').value = '';
+        document.getElementById('destination-input').placeholder = selection.dest.iata;
+        document.getElementById('destination-input').value = '';
 
-        document.getElementById('flight-progress').value = null;
+        document.getElementById('flight-progress').value = 0;
 
-        document.getElementById('aircraft-reg').textContent = info.aircraft.reg;
-        if (info.aircraft.country) {
-            document.getElementById('aircraft-reg-flag').style.backgroundImage = 'url(/image/flag/' + info.aircraft.country + ')';
-            document.getElementById('aircraft-reg-flag').style.display = null;
+        document.getElementById('aircraft-reg').textContent = selection.aircraft.reg;
+        if (selection.aircraft.country) {
+            document.getElementById('aircraft-reg-flag').style.backgroundImage = 'url(/image/flag/' + selection.aircraft.country + ')';
+            document.getElementById('aircraft-reg-flag').style.display = '';
         } else {
             document.getElementById('aircraft-reg-flag').style.display = 'none';
-        }
-        document.getElementById('aircraft-type').textContent = info.aircraft.type;
-        if (info.aircraft.reg || info.aircraft.country || info.aircraft.type) {
-            document.getElementById('aircraft-type').parentNode.style.display = null;
+        };
+        document.getElementById('aircraft-type').textContent = selection.aircraft.type;
+        if (selection.aircraft.reg || selection.aircraft.country || selection.aircraft.type) {
+            document.getElementById('aircraft-type').parentNode.style.display = '';
         } else {
             document.getElementById('aircraft-type').parentNode.style.display = 'none';
-        }
+        };
 
         document.getElementById('aircraft-hdg').textContent = Math.round(selection.hdg) + 'º';
         document.getElementById('aircraft-hdg-indicator').style.transform = 'rotate(' + selection.hdg + 'deg)';
 
         document.getElementById('aircraft-speed').textContent = Math.round(selection.speed);
-        const speedBounded = Math.max(0, Math.min((selection.speed/600), 1));
-        const dashoffset = 188.4 - (speedBounded * 188.4);
-        document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = dashoffset;
+        const speedBounded = Math.max(0, Math.min((selection.speed/600), 1)); // max 600 KT
+        const speedDashoffset = 188.4 - (speedBounded * 188.4);
+        document.getElementById('aircraft-speed-indicator').style.strokeDashoffset = speedDashoffset;
 
-        document.getElementById('aircraft-vspeed').textContent = Math.round(Math.abs(selection.vspeed));
+        document.getElementById('aircraft-climb').textContent = Math.round(Math.abs(selection.climb));
         let indicator;
-        if (Math.round(selection.vspeed) > 0) {
+        if (Math.round(selection.climb) > 0) {
             indicator = '▲';
-        } else if (Math.round(selection.vspeed) === 0) {
+        } else if (Math.round(selection.climb) === 0) {
             indicator = '►';
-        } else if (Math.round(selection.vspeed) < 0) {
+        } else if (Math.round(selection.climb) < 0) {
             indicator = '▼';
-        }
-        document.getElementById('aircraft-vspeed-indicator').textContent = indicator;
+        };
+        document.getElementById('aircraft-climb-indicator').textContent = indicator;
 
         if (selection.alt > 18000) { // can safely assume above the T. alt globally
             document.getElementById('aircraft-alt-main').textContent = 'FL' + Math.floor(selection.alt/100);
@@ -467,25 +463,27 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             document.getElementById('aircraft-alt-main').textContent = Math.round(selection.alt);
             document.getElementById('aircraft-alt-alt').textContent = 'FT';
-        }
-        document.getElementById('aircraft-alt-indicator').setAttribute('y1', 87.5 - (selection.alt/41000) * 75);
+        };
+        const altBounded = Math.max(0, Math.min((selection.alt/41000), 1));
+        const altDashoffset = 75 - (altBounded * 75);
+        document.getElementById('aircraft-alt-indicator').style.strokeDashoffset = altDashoffset;
 
         document.getElementById('origin-input').addEventListener('input', function() {
             if (this.value.length == 3) {
-                socket.emit('lookup.airport', this.value, 'origin');
+                socketio.emit('lookup.airport', this.value, 'origin');
                 document.getElementById('destination-input').focus();
             } else {
                 document.getElementById('aircraft-route-origin').innerHTML = 'Origin';
-            }
+            };
         });
 
         document.getElementById('destination-input').addEventListener('input', function() {
             if (this.value.length == 3) {
-                socket.emit('lookup.airport', this.value, 'destination');
+                socketio.emit('lookup.airport', this.value, 'destination');
                 document.getElementById('destination-input').blur()
             } else {
                 document.getElementById('aircraft-route-destination').innerHTML = 'Destination';
-            }
+            };
         });
 
         plotRoutes();
@@ -495,30 +493,19 @@ document.addEventListener("DOMContentLoaded", function() {
             point.y += 180;
         } else {
             point.x -= 160;
-        }
+        };
         map.panTo(map.containerPointToLatLng(point));
 
         setContainerDefaultScroll('smooth');
         document.getElementById('back').addEventListener('click', clearMap);
-        document.getElementById('aircraft-img').style.display = null;
-        aircraftView.style.display = null;
+        document.getElementById('main-container-aircraft-view').style.display = '';
     });
 
-    socket.on('lookup.airport', function(airport) {
+    socketio.on('lookup.airport', function(airport) {
         if (airport.routing !== null) {
-            if (airport.routing == 'origin') {
-                if (selection.icao24 === polylines.icao24) {
-                    info.origin = airport;
-                }
-                document.getElementById('aircraft-route-origin').textContent = airport.muni
-                socket.emit("lookup.add_origin", selection.callsign, airport.icao);
-            } else if (airport.routing == 'destination') {
-                if (selection.icao24 === polylines.icao24) {
-                    info.destination = airport;
-                }
-                document.getElementById('aircraft-route-destination').textContent = airport.muni
-                socket.emit("lookup.add_destination", selection.callsign, airport.icao);
-            }
-        }
+            selection[airport.routing.substring(0, 4)] = airport;
+            document.getElementById('aircraft-route-' + airport.routing).textContent = airport.muni;
+            socketio.emit('lookup.add_' + airport.routing.substring(0, 4), selection.csign, airport.icao);
+        };
     });
 });
