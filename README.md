@@ -2,6 +2,9 @@
 
 Hopefully eventually an ADSB decoder and web flight tracking interface. At the moment uses [OpenSky Network](https://opensky-network.org) API states instead of decoding from a hardware reciever.
 
+![Demo](demo/demo-light.png#gh-light-mode-only)
+![Demo](demo/demo-dark.png#gh-dark-mode-only)
+
 ## Installation & usage for now
 1. Clone this repository and run `pip install -r requirements.txt` (preferably in a virtual environment) and then `cd` to `src/`
 2. For a fresh install, run:
