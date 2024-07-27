@@ -166,4 +166,7 @@ def handle_lookup_all(icao, csign):
 
 if __name__ == "__main__":
     print(f"Running on http://localhost:{S.get('port')}")
-    socketio.run(flask, host="0.0.0.0", port=S.get("port"))
+    try:
+        socketio.run(flask, host="0.0.0.0", port=S.get("port"))
+    except KeyboardInterrupt:
+        pass

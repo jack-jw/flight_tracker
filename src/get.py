@@ -341,12 +341,12 @@ def check_dbs(output=print):
         for table in tables:
             cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
             if cursor.fetchone() is None:
-                needs_update.append(table)
+                needs_update += [(db_path, table)]
         cursor.close()
         db.close()
 
-    for index, table in enumerate(needs_update):
-        output(f"{index + 1}/{len(needs_update)} creating {table} table")
+    for index, (db_path, table) in enumerate(needs_update):
+        output(f"{index + 1}/{len(needs_update)} creating {table} table @ {db_path}")
         update_db(table)
 
 def add_route(csign, orig=None, dest=None):

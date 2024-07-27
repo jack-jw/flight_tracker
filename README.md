@@ -8,30 +8,39 @@ _Image of aircraft © Bahnfrend under CC BY-SA 4.0_
 
 ## Installation & usage for now
 1. Clone this repository and run `pip install -r requirements.txt` (preferably in a virtual environment) and then `cd` to `src/`
-2. For a fresh install, run:
-```zsh
-python3 opensky.py | python3 main.py
-```
-This runs [opensky.py](src/opensky.py), which, after downloading necessary datasets for you (just over 100MB to download about worldwide aircraft, airlines etc., just under 50MB when stored locally) sends a GET request to OpenSky and converts it to the format used by flight\_tracker, then the converted API response is passed to [main.py](src/main.py) which will load the API response and start the site.
 
-To conserve your OpenSky API limit of 100 worldwide aircraft requests per day (and improve start time) run:
+2. To start, run:
 ```zsh
 python3 opensky.py > aircraft.json
 ```
-And then pass the file to main.py.
+This runs [opensky.py](src/opensky.py), which, sends a GET request to OpenSky and converts it to the format used by flight\_tracker. stdout is redirected to a JSON file (aircraft.json in this case, it can be better to save it to your downloads folder or similar). The OpenSky API is limited to 100 worldwide requests per day.
 
-3. The site will be put up at http://localhost:5003
-4. The converted API response can be downloaded at http://localhost:5003/aircraft.json if you didn't save it in step 2, this file can then be passed to main.py
-5. To quit, `KeyboardInterrupt` with `⌃C`.
+_On your first run, just over 100MB of data about worldwide aircraft, airlines etc., will be downloaded to get information about flights (takes up just under 50MB when stored locally). The datasets are stored at `~/Library/Application Support` and `~/Library/Caches` on macOS and at `~/.flight_tracker` on Linux._
+
+3. When this is done, run:
+```zsh
+python3 main.py < aircraft.json
+```
+The converted API response is passed to [main.py](src/main.py) which will load it and start the site at http://localhost:5003 by default.
+
+_Once you have the local databases downloaded, you can pipe the output directly from opensky.py to main.py although I wouldn't recommend it because of the API rate limits._
+
+4. To quit, `KeyboardInterrupt` with `⌃C`.
 
 ### Options
-* To change options, use the `defaults` command with the domain flight_tracker.
+* To change options on macOS, use the `defaults` command with the domain flight_tracker, for example:
+```zsh
+defaults write flight_tracker port -int 8080
+```
+
 * To view the default settings (to know what you can change), `cd` to `src/` and run:
 ```python
 >>> from instance import Settings
 >>> Settings.defaults
 ```
 in the Python shell, to see the default settings printed as a dictionary.
+
+* On Linux, you can add to the `~/.flight_tracker/settings.json` file with the settings from above.
 
 ## To-do
 * Make web interface (using opensky api demo json files for testing)
