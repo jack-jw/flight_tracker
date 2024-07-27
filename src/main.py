@@ -1,183 +1,177 @@
 # main.py
 
 """
-For now just starts the HTTP server
+Starts the HTTP server
 
 Functions:
     start()
 """
 
-from gevent import monkey
-monkey.patch_all()
+# pylint: disable=wrong-import-position,wrong-import-order
+from gevent.monkey import patch_all
+patch_all()
 
-from os import urandom, getlogin
-from os.path import exists
-from sys import argv
-from base64 import b64decode
-from flask import Flask, render_template, send_from_directory, request, jsonify
+from os import urandom
+from sys import stdin
+from random import shuffle
+from json import loads
+from xml.etree.ElementTree import parse, tostring
+from flask import Flask, jsonify, render_template
 from flask_socketio import SocketIO, emit
-
-from paths import INSTANCE_IMAGES, LOCAL_IMAGES
-import lookup
-import jetphotos
-import opensky
-import my_flights
-
-nato = {
-    "0": "ZERO",
-    "1": "ONE",
-    "2": "TWO",
-    "3": "THREE",
-    "4": "FOUR",
-    "5": "FIVE",
-    "6": "SIX",
-    "7": "SEVEN",
-    "8": "EIGHT",
-    "9": "NINER",
-    "A": "ALPHA",
-    "B": "BRAVO",
-    "C": "CHARLIE",
-    "D": "DELTA",
-    "E": "ECHO",
-    "F": "FOXTROT",
-    "G": "GOLF",
-    "H": "HOTEL",
-    "I": "INDIA",
-    "J": "JULIET",
-    "K": "KILO",
-    "L": "LIMA",
-    "M": "MIKE",
-    "N": "NOVEMBER",
-    "O": "OSCAR",
-    "P": "PAPA",
-    "Q": "QUEBEC",
-    "R": "ROMEO",
-    "S": "SIERRA",
-    "T": "TANGO",
-    "U": "UNIFORM",
-    "V": "VICTOR",
-    "W": "WHISKEY",
-    "X": "X-RAY",
-    "Y": "YANKEE",
-    "Z": "ZULU"
-}
+from instance import Settings as S
+import get
 
 def start():
     """
     Start the HTTP server
     """
 
+    get.check_dbs()
+    graphics = {}
+    graphics["flags"] = parse("flags.xml").getroot()
+    with open("aircraft.svg", "r", encoding="utf-8") as svg:
+        graphics["aircraft"] = svg.read()
+
     # will be replaced by the actual decoder later
-    if len(argv) != 2:
-        raise SystemExit(f"usage: {__file__} [path/to/OpenSky/API/response]")
-    if not exists(argv[1]) or not argv[1].endswith(".json"):
-        raise SystemExit(f"Invalid file: {argv[1]}")
-    aircraft = opensky.load(argv[1].replace("\\", "").strip(), num_only=True)
+    aircraft = loads(stdin.read())
 
-    app = Flask("flight_tracker")
-    app.config["SECRET_KEY"] = urandom(24)
-    socketio = SocketIO(app, async_mode="gevent")
+    flask = Flask("flight_tracker")
+    flask.config["SECRET_KEY"] = urandom(24)
+    socketio = SocketIO(flask)
 
-    @app.route("/")
+    @flask.route("/")
     def serve_map():
-        return render_template("map.html", initial=getlogin()[:1].upper(), colour="#3478F6")
+        """
+        Render and return the map HTML
+        """
 
-    @app.route("/image/flag/<country>")
+        return render_template("map.jinja",
+                                initial=S.get("name")[0],
+                                colour=S.get("colour"),
+                                aircraft_icons=graphics["aircraft"])
+
+    @flask.route("/aircraft.json")
+    def serve_aircraft_json():
+        """
+        Get the current state of aircraft as a JSON file
+        """
+        return jsonify(aircraft)
+
+    @flask.route("/image/flag/<country>")
     def serve_flag(country):
-        return send_from_directory("static/flags", country.lower() + ".svg")
+        """
+        Get the flag of a country (from flags.xml) by its ISO 2-letter code
+        """
+        common = ("<svg xmlns=\"http://www.w3.org/2000/svg\" "
+                  "viewBox=\"0 0 512 512\" height=\"512\" width=\"512\"")
+        flag = graphics["flags"].find(f".//*[@id='{country.lower()}']")
+        if flag is None:
+            flag = graphics["flags"].find(".//*[@id='xx']")
+        flag = tostring(flag, encoding="unicode").replace("<svg", common)
+        return flag, 200, {"Content-Type": "image/svg+xml"}
 
-    @app.route("/image/aircraft/<tail>")
-    def serve_aircraft_image(tail):
-        placeholder = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAA"
-                                "AAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
-        if tail == "placeholder":
-            return placeholder, 200, {"Content-Type": "image/png"}
-
-        if exists(f"{INSTANCE_IMAGES}/aircraft-{tail}.jpeg"):
-            return send_from_directory(INSTANCE_IMAGES, f"aircraft-{tail}.jpeg")
-
-        image = jetphotos.thumb(tail)
-        if image:
-            return send_from_directory(LOCAL_IMAGES, image)
-        return placeholder, 200, {"Content-Type": "image/png"}
-
-    @app.route("/image/icon/<icontype>")
-    def serve_icon(icontype):
-        return send_from_directory("static/aircraft", icontype + ".svg")
-
-    @app.route("/image/icon/untyped/<type>")
-    def serve_untyped_icon(type):
-        return send_from_directory("static/aircraft", lookup.aircraft_icon(type)["icon"] + ".svg")
-
-    @app.route("/my")
+    @flask.route("/my")
     def serve_my_flights():
-        return render_template("my_flights.html", name=getlogin(), initial=getlogin()[:1].upper(), colour="#3478F6")
+        """
+        Render and return the my_flights HTML
+        """
+        return render_template("my_flights.jinja",
+                                name=S.get("name"),
+                                initial=S.get("name")[0],
+                                colour=S.get("colour"),
+                                my_flights=get.my_flights(),
+                                aircraft_icons=graphics["aircraft"])
 
-    @app.route("/my.json")
-    def serve_my_flights_json():
-        return jsonify(my_flights.get())
-
-    @app.route("/my.csv")
-    def serve_my_flights_csv():
-        return my_flights.csv(), 200, {"Content-Type": "text/csv"}
-
-    @socketio.on("decoder.get")
+    @socketio.on("connect")
     def handle_decoder_get():
-        emit("decoder.get", opensky.preemit(aircraft))
+        """
+        Emit the current aircraft state dictionary
+        Adds the aircraft to the map on the front end
+        """
+        aircraft_list = list(aircraft.items())
+        shuffle(aircraft_list)
+        shuffled_aircraft = dict(aircraft_list[:750])
+        emit("aircraft", shuffled_aircraft)
 
     @socketio.on("lookup.airport")
     def handle_lookup_airport(code, routing=None):
-        airport = lookup.airport(code)
+        """
+        Look up an airport using get.info(..., "airport")
+        Takes an airport code (IATA or ICAO)
+        Returns a dictionary with keys the same as get.info(..., "airport")
+        Accepts routing
+        """
+        airport = get.info(code, "airport")
         airport["routing"] = routing
         emit("lookup.airport", airport)
 
-    @socketio.on("lookup.add_origin")
-    def handle_lookup_add_origin(callsign, origin):
-        lookup.add_origin(callsign, origin)
+    @socketio.on("lookup.add_orig")
+    def handle_lookup_add_orig(csign, orig):
+        """
+        Add a route's origin using get.add_route()
+        Takes a callsign and a route origin ICAO (4 character)
+        """
+        get.add_route(csign, orig=orig)
 
-    @socketio.on("lookup.add_destination")
-    def handle_lookup_add_destination(callsign, destination):
-        lookup.add_destination(callsign, destination)
+    @socketio.on("lookup.add_dest")
+    def handle_lookup_add_dest(csign, dest):
+        """
+        Add a route's destination using get.add_route()
+        Takes a callsign and a route destination ICAO (4 character)
+        """
+        get.add_route(csign, dest=dest)
 
-    @socketio.on("lookup.all")
-    def handle_lookup_all(icao24, callsign):
-        info = {}
-        info["airline"] = lookup.airline(callsign)
-        info["aircraft"] = lookup.aircraft(icao24)
-        info["callsign"] = callsign
+    @socketio.on("select")
+    def handle_lookup_all(icao, csign):
+        """
+        Get infromation about an aircraft and its airline and route using get.info(),
+        and its image using get.image()
+        Selects the aircraft on the front end
+        Takes an aircraft's ICAO 24-bit address and its callsign
+        Returns a dictionary with keys aircraft, airline, callsign, dest, radio, image, orig
+        Keys are the same as get.info() functions
+        """
+        info = {
+            "aircraft": get.info(icao, "aircraft"),
+            "airline": get.info(csign, "airline"),
+            "csign": csign,
+        }
 
         if "radio" in info["airline"]:
-            info["radio"] = info["airline"]["radio"]
-            for char in callsign[3:]:
-                info["radio"] += " " + nato[char]
+            info["radio"] = (info["airline"]["radio"] + " " + get.radio(csign[3:])).strip()
 
         if "name" not in info["airline"]:
             if "operatoricao" in info["aircraft"]:
-                airline = lookup.airline(info["aircraft"]["operatoricao"])
-                if "name" in "airline":
+                airline = get.info(info["aircraft"]["operatoricao"], "airline")
+                if "name" in airline:
                     info["airline"]["name"] = airline["name"]
 
-            # structure this better?
             if "name" not in info["airline"]:
                 if "operator" in info["aircraft"]:
                     info["airline"]["name"] = info["aircraft"]["operator"]
                 elif "owner" in info["aircraft"]:
                     info["airline"]["name"] = info["aircraft"]["owner"]
 
-        route = lookup.route(callsign)
+        route = get.info(csign, "route")
         if route:
-            info["origin"] = (lookup.airport(route["origin"])
-                              if "origin" in route else None)
-            info["destination"] = (lookup.airport(route["destination"])
-                                   if "destination" in route else None)
+            info["orig"] = (get.info(route["orig"], "airport")
+                            if "orig" in route else None)
+            info["dest"] = (get.info(route["dest"], "airport")
+                            if "dest" in route else None)
         else:
-            info["origin"] = info["destination"] = None
+            info["orig"] = info["dest"] = None
 
-        emit("lookup.all", info)
+        if "reg" in info["aircraft"]:
+            info["image"] = get.image(info["aircraft"]["reg"], "reg", S.get("usewikimedia"))
+        elif not S.get("usewikimedia"):
+            info["image"] = get.image(icao, "hex")
+        else:
+            info["image"] = {"src": None, "attr": None, "link": None}
 
-    print("Running on http://localhost:5003")
-    socketio.run(app, host="0.0.0.0", port=5003)
+        emit("select", info)
+
+    print(f"Running on http://localhost:{S.get('port')}")
+    socketio.run(flask, host="0.0.0.0", port=S.get("port"))
 
 if __name__ == "__main__":
-    lookup.check()
     start()

@@ -26,7 +26,7 @@ from csv import reader
 import sqlite3
 import requests
 from bs4 import BeautifulSoup
-from instance import Path
+from instance import Path as P
 
 _URLS = {
     "airlines_wiki": "https://en.wikipedia.org/wiki/List_of_airline_codes",
@@ -54,7 +54,7 @@ def _get_airlines_table():
     soup = BeautifulSoup(response.content, "html.parser")
     table = soup.find("table", class_="wikitable")
 
-    main_db = sqlite3.connect(Path.localdb)
+    main_db = sqlite3.connect(P.localdb)
     cursor = main_db.cursor()
 
     try:
@@ -143,7 +143,7 @@ def _get_row(table, search_column, query):
     Returns the row as a dictionary
     """
 
-    db_path = Path.instancedb if table == "routes" else Path.localdb
+    db_path = P.instancedb if table == "routes" else P.localdb
     db = sqlite3.connect(db_path)
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
@@ -182,7 +182,7 @@ def _get_country_from_reg(reg):
     if not reg:
         return None
 
-    main_db = sqlite3.connect(Path.localdb)
+    main_db = sqlite3.connect(P.localdb)
     cursor = main_db.cursor()
 
     while True:
@@ -224,7 +224,7 @@ def update_db(table):
                 "operator",
                 "del_operatorcsign",
                 "operatoricao",
-                "del_oia",
+                "del_operatoriata",
                 "owner",
                 "del_test_reg",
                 "reged",
@@ -241,7 +241,7 @@ def update_db(table):
                 "del_categorydesc"
             )
 
-            _csv_to_db(Path.localdb, _URLS["aircraft"], "aircraft", aircraft_headers, "icao")
+            _csv_to_db(P.localdb, _URLS["aircraft"], "aircraft", aircraft_headers, "icao")
 
         case "airports":
             airport_headers = (
@@ -265,7 +265,7 @@ def update_db(table):
                 "del_keywords"
             )
 
-            _csv_to_db(Path.localdb, _URLS["airports"], "airports", airport_headers)
+            _csv_to_db(P.localdb, _URLS["airports"], "airports", airport_headers)
 
         case "airlines":
             _get_airlines_table()
@@ -277,7 +277,7 @@ def update_db(table):
                 "size"
             )
 
-            _csv_to_db(Path.localdb, _URLS["icontypes"], "icontypes", icontypes_headers, "type")
+            _csv_to_db(P.localdb, _URLS["icontypes"], "icontypes", icontypes_headers, "type")
 
         case "prefixes":
             prefix_headers = (
@@ -285,10 +285,10 @@ def update_db(table):
                 "country"
             )
 
-            _csv_to_db(Path.localdb, _URLS["prefixes"], "prefixes", prefix_headers, "prefix")
+            _csv_to_db(P.localdb, _URLS["prefixes"], "prefixes", prefix_headers, "prefix")
 
         case "my_flights":
-            instance_db = sqlite3.connect(Path.instancedb)
+            instance_db = sqlite3.connect(P.instancedb)
             cursor = instance_db.cursor()
 
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' "
@@ -303,7 +303,7 @@ def update_db(table):
             instance_db.close()
 
         case "routes":
-            instance_db = sqlite3.connect(Path.instancedb)
+            instance_db = sqlite3.connect(P.instancedb)
             cursor = instance_db.cursor()
 
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' "
@@ -330,8 +330,8 @@ def check_dbs(output=print):
     """
 
     dbs = {
-        Path.localdb: ("airlines", "aircraft", "airports", "icontypes", "prefixes"),
-        Path.instancedb: ("routes", "my_flights")
+        P.localdb: ("airlines", "aircraft", "airports", "icontypes", "prefixes"),
+        P.instancedb: ("routes", "my_flights")
     }
     needs_update = []
 
@@ -358,7 +358,7 @@ def add_route(csign, orig=None, dest=None):
     if not (csign and (orig or dest)):
         return
 
-    instance_db = sqlite3.connect(Path.instancedb)
+    instance_db = sqlite3.connect(P.instancedb)
     cursor = instance_db.cursor()
     cursor.execute("SELECT * FROM routes WHERE csign = ?", (csign,))
     row_exists = cursor.fetchone()
@@ -388,7 +388,7 @@ def info(query, kind):
     Kinds:
         airline - look up an airline from a callsign
         aircraft - look up an aircraft from a 24-bit ICAO address
-        icontype - get the closest icon of an aircraft from its typecode
+        icontype - get the closest icon of an aircraft from its type
         airport - look up an airport from a 4-digit ICAO or 3-digit IATA code
         route - look up a route from its callsign
 
@@ -442,11 +442,12 @@ def basic(icao):
         result["reg"] = aircraft_info["reg"]
 
     if "type" in aircraft_info:
-        result["typecode"] = aircraft_info["type"]
-
-    result["icon"] = info(result["typecode"], "icontype")
-    if "type" in result["icon"]:
-        del result["icon"]["type"]
+        result["type"] = aircraft_info["type"]
+        result["icon"] = info(result["type"], "icontype")
+        if "type" in result["icon"]:
+            del result["icon"]["type"]
+    else:
+        result["icon"] = {"icon": "generic", "size": 28}
 
     return result
 
@@ -588,7 +589,7 @@ def my_flights():
 
     update_db("my_flights")
 
-    db = sqlite3.connect(Path.instancedb)
+    db = sqlite3.connect(P.instancedb)
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
     cursor.execute("SELECT * FROM my_flights")
