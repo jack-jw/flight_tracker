@@ -1,4 +1,4 @@
-# get.py (called lookup.py on this commit to see diff from original lookup.py)
+# get.py
 
 """
 Get things:
