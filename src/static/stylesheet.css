@@ -3,7 +3,6 @@
 :root {
     --default-fonts: Inter, -apple-system, BlinkMacSystemFont, "SF Pro", "Helvetica Neue", system-ui, "Segoe UI", Roboto, sans-serif;
     font-family: var(--default-fonts);
-    font-feature-settings: "liga" 1, "calt" 1/*, "ss04" 1*/; /* ss04 for disambiguation */
     --colour: black;
     --background-colour: rgba(247, 247, 246, 0.9);
     --control-colour: rgba(189, 189, 191, 1);

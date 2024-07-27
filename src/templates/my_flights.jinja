@@ -34,6 +34,15 @@
             font-display: block;
             src: url("{{ url_for('static', filename='fonts/inter-italic.woff2') }}") format('woff2');
         }
+
+        :root {
+            accent-color: {{ colour }};
+            font-feature-settings: "liga" 1, "calt" 1{{ ', "ss02" 1' if fontdisambiguation else "" }};
+        }
+
+        #pfp {
+            background-color: {{ colour }}
+        }
     </style>
 </head>
 <body>
@@ -43,7 +52,7 @@
     <div id="map"></div>
     <div id="my-flights-body">
         <div class="my-flights-title-container">
-            <div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div>
+            <div id="pfp">{{ initial }}</div>
             <div class="my-flights-pre-title">My Flights</div>
             <div class="my-flights-title">{{ name }}</div>
         </div>

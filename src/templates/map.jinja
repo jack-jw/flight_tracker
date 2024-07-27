@@ -36,6 +36,11 @@
 
         :root {
             accent-color: {{ colour }};
+            font-feature-settings: "liga" 1, "calt" 1{{ ', "ss02" 1' if fontdisambiguation else "" }};
+        }
+
+        #pfp {
+            background-color: {{ colour }}
         }
 
         #flight-progress::-webkit-progress-value {
@@ -145,7 +150,7 @@
         <div id="main-container-main-view">
             <div id="resize-handle"></div>
 
-            <a href="/my"><div id="pfp" style="background-color: {{ colour }}">{{ initial }}</div></a>
+            <a href="/my"><div id="pfp">{{ initial }}</div></a>
             <input id="aircraft-list-filter" placeholder="Filter...">
             <div id="aircraft-list-clear" class="hidden"></div>
             <div id="aircraft-list"></div>

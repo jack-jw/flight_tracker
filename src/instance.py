@@ -72,7 +72,8 @@ class Settings:
         "name": getuser(),
         "colour": "#3478F6",
         "port": 5003,
-        "usewikimedia": False
+        "usewikimedia": False,
+        "fontdisambiguation": False
     }
 
     # Check system

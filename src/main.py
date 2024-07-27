@@ -40,6 +40,7 @@ def serve_map():
     return render_template("map.jinja",
                             initial=S.get("name")[0],
                             colour=S.get("colour"),
+                            fontdisambiguation=S.get("fontdisambiguation"),
                             aircraft_icons=graphics["aircraft"])
 
 @flask.route("/aircraft.json")
@@ -71,6 +72,7 @@ def serve_my_flights():
                             name=S.get("name"),
                             initial=S.get("name")[0],
                             colour=S.get("colour"),
+                            fontdisambiguation=S.get("fontdisambiguation"),
                             my_flights=get.my_flights(),
                             aircraft_icons=graphics["aircraft"])
 
