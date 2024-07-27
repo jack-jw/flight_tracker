@@ -89,6 +89,7 @@ in the Python shell, to see the default settings printed as a dictionary.
 * Later on, make actual ADSB decoder software to locally decode things
 
 ## Data sources
-* Aircraft table from [opensky-network.org](https://opensky-network.org/datasets/metadata)
+Downloaded as needed by [get.py](src/get.py)
+* Aircraft table from [opensky-network.org](https://opensky-network.org/datasets/metadata) under [their license](https://opensky-network.org/datasets/LICENSE.txt)
 * Airports table from [ourairports.com](https://ourairports.com/data) under the Unlicense
-* Codes table from [wikipedia.org](https://en.wikipedia.org/wiki/List_of_airline_codes)
+* Codes table from [wikipedia.org](https://en.wikipedia.org/wiki/List_of_airline_codes) under CC BY-SA 3.0
