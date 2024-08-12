@@ -4,7 +4,7 @@ Hopefully eventually an ADSB decoder and web flight tracking interface. At the m
 
 ![Demo](demo/demo-light.png#gh-light-mode-only)
 ![Demo](demo/demo-dark.png#gh-dark-mode-only)
-_Image of aircraft © Bahnfrend under CC BY-SA 4.0_
+_Image of aircraft © Bahnfrend (CC BY-SA 4.0)_
 
 ## Installation & usage for now
 1. Clone this repository and run `pip install -r requirements.txt` (preferably in a virtual environment) and then `cd` to `src/`
@@ -15,7 +15,7 @@ python3 opensky.py > aircraft.json
 ```
 This runs [opensky.py](src/opensky.py), which, sends a GET request to OpenSky and converts it to the format used by flight\_tracker. stdout is redirected to a JSON file (aircraft.json in this case, it can be better to save it to your downloads folder or similar). The OpenSky API is limited to 100 worldwide requests per day.
 
-_On your first run, just over 100MB of data about worldwide aircraft, airlines etc., will be downloaded to get information about flights (takes up just under 50MB when stored locally). The datasets are stored at `~/Library/Application Support` and `~/Library/Caches` on macOS and at `~/.flight_tracker` on Linux._
+_On your first run, just over 100MB of data about worldwide aircraft, airlines etc., will be downloaded to get information about flights (takes up just under 50MB when stored locally)._
 
 3. When this is done, run:
 ```zsh
@@ -35,12 +35,24 @@ defaults write flight_tracker port -int 8080
 
 * To view the default settings (to know what you can change), `cd` to `src/` and run:
 ```python
->>> from instance import Settings
->>> Settings.defaults
+>>> from get import DEFAULTS
+>>> DEFAULTS
 ```
-in the Python shell, to see the default settings printed as a dictionary.
+in the Python REPL, to see the default settings printed as a dictionary.
 
 * On Linux, you can add to the `~/.flight_tracker/settings.json` file with the settings from above.
+
+## Testing _My Flights_
+* There is no UI to add flights at the moment, so to populate the my flights page:
+    * Add your flights to https://my.flightradar24.com
+    * Download your flight log as a CSV at _Settings_ > _Export_
+    * Run these commands in the Python REPL:
+```python
+>>> from get import mfr24_to_mf
+>>> with open("path/to/your/my/flightradar/csv") as csv:
+>>>     mfr24_to_mf(csv.read())
+```
+The flights should now be visible through http://localhost:5003/my
 
 ## To-do
 * Make web interface (using opensky api demo json files for testing)

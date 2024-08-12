@@ -3,132 +3,31 @@
 document.addEventListener('DOMContentLoaded', function() {
     let totalDistance = 0;
 
-    // MARK: - Map
+    generateMap(3);
 
-    function plotGreatCircleRoute(startPoint, endPoint) {
-        function computeIntermediatePoint(start, end, ratio) {
-            const lat1 = start.lat * Math.PI / 180;
-            const lng1 = start.lng * Math.PI / 180;
-            const lat2 = end.lat * Math.PI / 180;
-            const lng2 = end.lng * Math.PI / 180;
-            const d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lng1 - lng2) / 2), 2)));
-            const A = Math.sin((1 - ratio) * d) / Math.sin(d);
-            const B = Math.sin(ratio * d) / Math.sin(d);
-            const x = A * Math.cos(lat1) * Math.cos(lng1) + B * Math.cos(lat2) * Math.cos(lng2);
-            const y = A * Math.cos(lat1) * Math.sin(lng1) + B * Math.cos(lat2) * Math.sin(lng2);
-            const z = A * Math.sin(lat1) + B * Math.sin(lat2);
-            const lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
-            const lng = Math.atan2(y, x) * 180 / Math.PI;
-            return [lat, lng];
-        };
-
-        function computeGreatCircleDistance(start, end) {
-            const R = 6371000;
-            const lat1 = start.lat * Math.PI / 180;
-            const lng1 = start.lng * Math.PI / 180;
-            const lat2 = end.lat * Math.PI / 180;
-            const lng2 = end.lng * Math.PI / 180;
-            const deltaLat = lat2 - lat1;
-            const deltalng = lng2 - lng1;
-            const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltalng / 2) * Math.sin(deltalng / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distance = R * c;
-            return distance;
-        };
-
-        const startLatLng = L.latLng(startPoint);
-        const endLatLng = L.latLng(endPoint);
-
-        const curvePoints = [];
-        for (let i = 0; i <= 100; i++) {
-            const ratio = i / 100;
-            const intermediatePoint = computeIntermediatePoint(startLatLng, endLatLng, ratio);
-            curvePoints.push(intermediatePoint);
-        };
-
-        const line = L.polyline(curvePoints, { color: '#FF9500', weight: 2, opacity: 0.75 }).addTo(map);
-        line.getElement().setAttribute('tabindex', '-1');
-        const distance = computeGreatCircleDistance(startLatLng, endLatLng);
-        return distance;
-    };
-
-    function setTheme(themeName) {
-        let tileLayerURL;
-        let credit;
-        switch (themeName) {
-            case 'standard':
-                tileLayerURL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
-                credit = 'Map data © OpenStreetMap contributors<br>Tiles © Humanitarian OpenStreetMap Team (HOT)';
-                document.querySelector('.leaflet-tile-pane').style.filter = null;
-                break;
-            case 'osm':
-                tileLayerURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                credit = 'Map data © OpenStreetMap contributors';
-                document.querySelector('.leaflet-tile-pane').style.filter = null;
-                break;
-            case 'watercolour':
-                tileLayerURL = 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg';
-                credit = 'Map data © OpenStreetMap contributors<br>Tiles © Stamen Design';
-                document.querySelector('.leaflet-tile-pane').style.filter = 'none';
-                break;
-            case 'satellite':
-                tileLayerURL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-                credit = 'Map data © Esri, World Imagery';
-                document.querySelector('.leaflet-tile-pane').style.filter = 'none';
-                break;
-            case 'atc':
-                tileLayerURL = 'https://data2.geo-fs.com/osm/{z}/{x}/{y}.png';
-                credit = 'Map data © OpenStreetMap contributors<br>Tiles © GeoFS';
-                document.querySelector('.leaflet-tile-pane').style.filter = null;
-                break;
-            default:
-                return;
-        };
-        tileLayer.setUrl(tileLayerURL);
-        document.getElementById('my-flights-map-credit').innerHTML = credit;
-    };
-
-    // MARK: Map definition
-    const map = L.map('map', {
-        center: [51.505, -0.09],
-        zoom: 3,
-        maxZoom: 15,
-        zoomControl: false,
-        attributionControl: false
-    });
-
-    const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            detectRetina: true, // not good for some of the maps
-        }).addTo(map);
-    setTheme('satellite');
-
-    // MARK: - Flights
-
-    function animateNumber(element, end, singular, plural, dp) {
-        let startTimestamp = null;
+    function animateNumber(id, end, word, dp = 0) {
+        let startTimestamp;
         const step = (timestamp) => {
-            if (!startTimestamp) { startTimestamp = timestamp; };
+            startTimestamp = startTimestamp || timestamp;
             const progress = Math.min((timestamp - startTimestamp) / 1000, 1);
             const displayedProgress = (progress * end).toFixed(dp);
-            let description;
-            if (displayedProgress === 1) { description = singular; };
-                else { description = plural; };
-            element.textContent = displayedProgress + description;
-            if (progress < 1) { window.requestAnimationFrame(step); };
+            const description = Array.isArray(word) ? displayedProgress === '1' ? word[1] : word[0] : word;
+            document.getElementById(id).textContent = description.replace('{}', parseFloat(displayedProgress).toLocaleString(strings.lang.code));
+            if (progress < 1) window.requestAnimationFrame(step);
         };
         window.requestAnimationFrame(step);
     };
 
-    function animateFlags(element, countryList) {
+    function animateFlags(id, countryList) {
         const interval = 1000 / countryList.length;
 
         let index = 0;
         const addFlag = () => {
             if (index < countryList.length) {
                 const flagElement = document.createElement('div');
-                flagElement.classList = 'flag';
+                flagElement.classList.add('flag');
                 flagElement.style.backgroundImage = 'url(/image/flag/' + countryList[index] + ')';
-                element.appendChild(flagElement);
+                document.getElementById(id).appendChild(flagElement);
                 index++;
             } else {
                 clearInterval(flagInterval);
@@ -137,68 +36,72 @@ document.addEventListener('DOMContentLoaded', function() {
         const flagInterval = setInterval(addFlag, interval);
     };
 
-    map.flyTo([myFlights.airports[myFlights.rankings.airports[0].icao].lat,
-               myFlights.airports[myFlights.rankings.airports[0].icao].lng]);
+    map.flyTo(mf.entities.airports[0]);
 
-    myFlights.flights.forEach(function(flight) {
-        totalDistance += plotGreatCircleRoute(myFlights.airports[flight.orig], myFlights.airports[flight.dest]);
+    mf.flights.forEach(function(flight) {
+        totalDistance += plotGreatCircleRoute(
+            mf.entities.airports.find(obj => obj.icao === flight.orig),
+            mf.entities.airports.find(obj => obj.icao === flight.dest),
+            0.75
+        ).distance;
     });
 
-    animateNumber(document.getElementById('my-flights-flight-count'), myFlights.flights.length, ' flight', ' flights', 0);
-    animateNumber(document.getElementById('my-flights-intercontinental-count'), myFlights.counts.inc, ' intercontinental', ' intercontinental', 0);
-    animateNumber(document.getElementById('my-flights-international-count'), myFlights.counts.int, ' international', ' international', 0);
-    animateNumber(document.getElementById('my-flights-domestic-count'), myFlights.counts.dom, ' domestic', ' domestic', 0);
+    animateNumber('my-flights-flight-count', mf.flights.length, strings.ui.myflightscounts.flight);
+    animateNumber('my-flights-inc-count', mf.counts.inc, strings.ui.myflightscounts.inc);
+    animateNumber('my-flights-int-count', mf.counts.int, strings.ui.myflightscounts.int);
+    animateNumber('my-flights-dom-count', mf.counts.dom, strings.ui.myflightscounts.dom);
+    animateNumber('my-flights-rnl-count', mf.counts.rnl, strings.ui.myflightscounts.rnl);
 
-    animateNumber(document.getElementById('my-flights-distance-count'), totalDistance / 1000, ' km', ' km', 0);
-    animateNumber(document.getElementById('my-flights-distance-count-earth'), totalDistance / 40030174, 'x around the Earth', 'x around the Earth', 2);
+    animateNumber('my-flights-distance-count', totalDistance * 1.85, '{} ' + strings.units.metric.distance.toLowerCase());
+    animateNumber('my-flights-distance-count-earth', totalDistance / 21620.65, strings.ui.myflightscounts.ofearth, 2);
 
-    animateNumber(document.getElementById('my-flights-country-count'), myFlights.countries.length, ' country', ' countries', 0);
-    animateFlags(document.getElementById('my-flights-country-count-flags'), myFlights.countries);
-    animateNumber(document.getElementById('my-flights-continent-count'), myFlights.continents.length, ' out of the 7 continents', ' out of the 7 continents', 0);
+    animateNumber('my-flights-country-count', mf.countries.length, strings.ui.myflightscounts.country);
+    animateFlags('my-flights-country-count-flags', mf.countries);
+    animateNumber('my-flights-continent-count', mf.continents.length, strings.ui.myflightscounts.ofcontinents);
 
-    animateNumber(document.getElementById('my-flights-airports-title'), Object.keys(myFlights.airports).length, ' airport', ' airports', 0);
-    animateNumber(document.getElementById('my-flights-airlines-title'), Object.keys(myFlights.airlines).length, ' airline', ' airlines', 0);
-    animateNumber(document.getElementById('my-flights-types-title'), Object.keys(myFlights.types).length, ' aircraft type', ' aircraft types', 0);
+    animateNumber('my-flights-airports-title', mf.entities.airports.length, strings.ui.myflightscounts.airport);
+    animateNumber('my-flights-airlines-title', mf.entities.airlines.length, strings.ui.myflightscounts.airline);
+    animateNumber('my-flights-types-title', mf.entities.types.length, strings.ui.myflightscounts.type);
 
-    Object.values(myFlights.airports).forEach(function(airport) {
+    mf.entities.airports.forEach(function(airport) {
         const tooltipContent = `
             <div class="my-flights-airport-tooltip-title">
                 <span class="flag" style="background-image: url('/image/flag/${airport.country}')"></span>
                 <span class="my-flights-airport-tooltip-iata">${airport.iata}</span> ${airport.name.replace('International', "Int'l").replace('Airport', '').trim()}
             </div>
-            <div class="my-flights-airport-tooltip-flights">${airport.flights} flight${airport.flights > 1 ? 's' : ''}</div>
+            <div class="my-flights-airport-tooltip-flights">${strings.ui.myflightscounts.flight[(airport.flights > 1 ? 0 : 1)].replace('{}', airport.flights)}</div>
         `;
 
-        L.marker([airport.lat, airport.lng], {
+        L.marker(airport, {
             icon: L.divIcon({
-                className: 'my-flights-airport-icon',
+                className: 'airport-icon',
                 html: '<div></div>',
                 iconSize: [12, 12]
             })
-        }).addTo(map).setZIndexOffset(airport.flights).bindTooltip(tooltipContent, { className: 'my-flights-airport-tooltip' });
+        }).addTo(map).setZIndexOffset(airport.flights).bindTooltip(tooltipContent, {className: 'my-flights-airport-tooltip'});
     });
 
-    Object.keys(myFlights.rankings).forEach(function(category) {
-        const baseClass = `my-flights-${category}-`;
+    (["airlines", "airports", "types"]).forEach(function(category) {
+        const baseClass = 'my-flights-' + category + '-';
         for (let i = 0; i < 5; i++) {
             const rankItem = document.getElementById(baseClass + i);
             const rankIcon = rankItem.querySelector('.my-flights-rank-icon');
             let displayName, bg;
 
             if (category === 'airlines') {
-                displayName = myFlights.airlines[myFlights.rankings.airlines[i].icao].name;
-                bg = 'url("https://www.flightaware.com/images/airline_logos/180px/' + myFlights.rankings.airlines[i].icao + '.png")';
+                displayName = mf.entities.airlines[i].name.replace('International', "Int'l");
+                bg = 'url("https://www.flightaware.com/images/airline_logos/180px/' + mf.entities.airlines[i].icao + '.png")';
             } else if (category === 'types') {
-                displayName = myFlights.rankings.types[i].icao;
-                rankIcon.innerHTML = '<svg><use href="#' + myFlights.types[myFlights.rankings.types[i].icao].icon +'"></use></svg>';
+                displayName = mf.entities.types[i].icao;
+                rankIcon.innerHTML = '<svg><use href="#' + mf.entities.types[i].icon + '"></use></svg>';
             } else if (category === 'airports') {
-                displayName = myFlights.airports[myFlights.rankings.airports[i].icao].iata;
-                bg = 'url("/image/flag/' + myFlights.airports[myFlights.rankings.airports[i].icao].country + '")';
+                displayName = mf.entities.airports[i].iata;
+                bg = 'url("/image/flag/' + mf.entities.airports[i].country + '")';
             };
 
             rankIcon.style.backgroundImage = bg;
             rankItem.querySelector('.my-flights-rank-name').textContent = displayName;
-            rankItem.querySelector('.my-flights-rank-amount').textContent = myFlights.rankings[category][i].flights + ' flight' + `${myFlights.rankings[category][i].flights > 1 ? 's' : ''}`;
+            rankItem.querySelector('.my-flights-rank-amount').textContent = strings.ui.myflightscounts.flight[(mf.entities[category][i].flights > 1 ? 0 : 1)].replace('{}', mf.entities[category][i].flights);
         };
     });
 });

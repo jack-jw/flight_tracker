@@ -1,9 +1,10 @@
 <!doctype html>
 <!-- templates/map.jinja -->
 
-<html lang="en">
+<html lang="{{ strings.lang.code }}">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
+    <title>{{ strings.ui.map }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
@@ -13,9 +14,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
     <link rel="icon" href="{{ url_for('static', filename='icon.jpeg') }}"/>
 
+    <script>const strings = {{ strings | tojson }}</script>
     <script src="{{ url_for('static', filename='leaflet.js') }}"></script>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
     <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='aircraft.js') }}"></script>
 
     <style>
         @font-face {
@@ -76,8 +79,8 @@
             <a id="aircraft-img-shadow" target="_blank"><img id="aircraft-img"/></a>
 
             <div id="aircraft-info">
-                <div id="aircraft-airline-callsign">
-                    <div id="aircraft-callsign"></div>
+                <div id="aircraft-airline-csign">
+                    <div id="aircraft-csign"></div>
                     <div style="position: absolute; width: calc(100% - 5.5em); white-space: nowrap;">
                         <img id="aircraft-airline-logo"></img>
                         <div id="aircraft-airline-name"></div>
@@ -85,16 +88,19 @@
                 </div>
                 <hr>
                 <div style="position: relative; height: 2ch; padding: 7.5px 0 0">
-                    <div id="aircraft-route-origin"></div>
-                    <div id="aircraft-route-destination"></div>
+                    <div id="aircraft-route-orig"></div>
+                    <div id="aircraft-route-dest"></div>
                 </div>
 
                 <div id="iata-inputs-parent">
-                    <input id="origin-input" class="iata-input" style="left: 0" contenteditable="true" maxlength="3" minlength="3" required/>
+                    <input id="orig-input" class="iata-input" style="left: 0" contenteditable="true"
+                           maxlength="3" minlength="3" required/>
 
-                    <input id="destination-input" class="iata-input" style="text-align: right; right: 0" contenteditable="true" maxlength="3" minlength="3" required/>
+                    <input id="dest-input" class="iata-input" style="text-align: right; right: 0"
+                           contenteditable="true" maxlength="3" minlength="3" required/>
 
-                    <svg id="iata-inputs-plane" viewBox="0 0 115 120" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="iata-inputs-plane" viewBox="0 0 115 120"
+                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M94.72,43.45s-13.43,0-23.65,0c-1.01,0-1.97-.46-2.59-1.26L36.39,1.57c-2.83-3.58-8.5-.47-7,3.84l13.43,38.55c-11.42.57-22.8,1.48-29.9,2.11l-6.13-14.08C5.26,28.47,0,29.56,0,33.41v42.27c0,3.84,5.26,4.94,6.79,1.41l6.13-14.09c7.13.62,18.55,1.54,29.9,2.11l-13.44,38.56c-1.5,4.31,4.17,7.43,7,3.84l32.09-40.63c.63-.79,1.58-1.26,2.59-1.26,10.23,0,23.65,0,23.65,0,0,0,18.66.02,18.66-11.09s-18.66-11.09-18.66-11.09Z"/>
                     </svg>
                 </div>
@@ -112,8 +118,10 @@
 
                 <div id="metre-container">
                     <svg viewBox="0 0 100 100" class="metre" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="40" stroke="var(--control-colour)" stroke-width="10px" stroke-dasharray="1, 4.23" fill="none"/>
-                        <text id="aircraft-hdg" x="51%" y="57%" text-anchor="middle" class="metre-value" style="font-size: 22px;"></text>
+                        <circle cx="50" cy="50" r="40" stroke="var(--control-colour)"
+                                stroke-width="10px" stroke-dasharray="1, 4.23" fill="none"/>
+                        <text id="aircraft-hdg" x="51%" y="57%" text-anchor="middle" class="metre-value"
+                              style="font-size: 22px;"></text>
                         <g id="aircraft-hdg-indicator" stroke="none" class="metre-indicator">
                             <g style="transform: translate(40.75px, 5px);">
                                 <rect fill="none" width="18.5" height="90"/>
@@ -122,26 +130,38 @@
                         </g>
                     </svg>
                     <svg viewBox="0 7.5 100 100" class="metre" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)" stroke-width="10" stroke-linecap="round"/>
+                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke="var(--hover-colour)"
+                              stroke-width="10" stroke-linecap="round"/>
 
-                        <text id="aircraft-speed" x="50" y="70" text-anchor="middle" class="metre-value"></text>
-                        <text x="50" y="90" text-anchor="middle" class="metre-unit">KTS</text>
+                        <text id="aircraft-speed" x="50" y="70" text-anchor="middle"
+                              class="metre-value"></text>
+                        <text x="50" y="90" text-anchor="middle" class="metre-unit">{{ strings.units
+                        .aviation.speed }}</text>
 
-                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke-width="10" stroke-dasharray="188.4" stroke-dashoffset="188.4" class="metre-indicator" id="aircraft-speed-indicator"/>
+                        <path d="M 20,90 A 40,40 0 1,1 80,90" fill="none" stroke-width="10"
+                              stroke-dasharray="188.4" stroke-dashoffset="188.4" class="metre-indicator"
+                              id="aircraft-speed-indicator"/>
                     </svg>
                     <svg viewBox="0 0 100 100" class="metre" xmlns="http://www.w3.org/2000/svg">
                         <text x="50" y="55" text-anchor="middle" class="metre-value">
-                            <tspan class="metre-indicator" id="aircraft-climb-indicator" stroke="none"></tspan>
+                            <tspan class="metre-indicator" id="aircraft-climb-indicator"
+                                   stroke="none"></tspan>
                             <tspan id="aircraft-climb"></tspan>
                         </text>
-                        <text x="50" y="75" text-anchor="middle" class="metre-unit">FT/MIN</text>
+                        <text x="50" y="75" text-anchor="middle" class="metre-unit">{{ strings.units
+                        .aviation.climb }}</text>
                     </svg>
                     <svg viewBox="0 0 125 100" class="metre" xmlns="http://www.w3.org/2000/svg">
-                        <text id="aircraft-alt-main" x="95" y="55" text-anchor="end" class="metre-value">
+                        <text id="aircraft-alt-main" x="95" y="55" text-anchor="end"
+                              class="metre-value">
                         </text>
-                        <text id="aircraft-alt-alt" x="95" y="75" text-anchor="end" class="metre-unit"></text>
-                        <line x1="115" x2="115" y1="87.5" y2="12.5" fill="none" stroke="var(--hover-colour)" stroke-width="10" stroke-linecap="round"/>
-                        <line x1="115" x2="115" y1="87.5" y2="12.5" fill="none" stroke-width="10" stroke-dasharray="75" class="metre-indicator" id="aircraft-alt-indicator"/>
+                        <text id="aircraft-alt-alt" x="95" y="75" text-anchor="end"
+                              class="metre-unit"></text>
+                        <line x1="115" x2="115" y1="87.5" y2="12.5" fill="none"
+                              stroke="var(--hover-colour)" stroke-width="10" stroke-linecap="round"/>
+                        <line x1="115" x2="115" y1="87.5" y2="12.5" fill="none" stroke-width="10"
+                              stroke-dasharray="75" class="metre-indicator"
+                              id="aircraft-alt-indicator"/>
                     </svg>
                 </div>
             </div>
@@ -150,16 +170,18 @@
         <div id="main-container-main-view">
             <div id="resize-handle"></div>
 
-            <a href="/my"><div id="pfp">{{ initial }}</div></a>
-            <input id="aircraft-list-filter" placeholder="Filter...">
+            <a href="/my">
+                <div id="pfp">{{ initial }}</div>
+            </a>
+            <input id="aircraft-list-filter" placeholder="{{ strings.ui.filter }}">
             <div id="aircraft-list-clear" class="hidden"></div>
             <div id="aircraft-list"></div>
             <footer class="credits">
-                Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet 🇺🇦</a>
+                <a target="_blank" href="https://leafletjs.com">{{ strings.acknowledgements.leaflet }}</a>
                 <br>
-                <span id="aircraft-list-map-credit"></span>
+                <span id="map-credit"></span>
                 <br><br>
-                <a target="_blank" href="about:blank">All acknowledgements &nearr;</a>
+                <a target="_blank" href="about:blank">{{ strings.acknowledgements.all }} &nearr;</a>
             </footer>
         </div>
     </div>

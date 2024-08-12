@@ -1,0 +1,88 @@
+{
+  "en": {
+    "lang": {
+      "name": "English",
+      "flag": "gb-eng",
+      "code": "en"
+    },
+    "acknowledgements": {
+      "all": "All acknowledgements",
+      "leaflet": "Map displayed by Leaflet 🇺🇦",
+      "mapdata": "Map data",
+      "maptiles": "Map tiles"
+    },
+    "logs": {
+      "badport": "Running port must be an integer",
+      "running": "Running on {}",
+      "creatingtable": "{i}/{l} creating {t} table @ {p}"
+    },
+    "ui": {
+      "myflightsadd": "Add Flight",
+      "dest": "Destination",
+      "filter": "Filter...",
+      "map": "Map",
+      "myflights": "My Flights",
+      "myflightscounts": {
+        "airline": [
+          "{} airlines",
+          "{} airline"
+        ],
+        "airport": [
+          "{} airports",
+          "{} airport"
+        ],
+        "country": [
+          "{} countries",
+          "{} country"
+        ],
+        "dom": [
+          "{} domestic",
+          "{} domestic"
+        ],
+        "flight": [
+          "{} flights",
+          "{} flight"
+        ],
+        "inc": [
+          "{} intercontinental",
+          "{} intercontinental"
+        ],
+        "int": [
+          "{} international",
+          "{} international"
+        ],
+        "ofcontinents": [
+          "{} out of the 7 continents",
+          "{} out of the 7 continents"
+        ],
+        "ofearth": [
+          "{}x around the Earth",
+          "{}x around the Earth"
+        ],
+        "rnl": [
+          "{} regional",
+          "{} regional"
+        ],
+        "type": [
+          "{} aircraft types",
+          "{} aircraft type"
+        ]
+      },
+      "orig": "Origin"
+    },
+    "units": {
+      "aviation": {
+        "alt": "FT",
+        "climb": "FT/MIN",
+        "distance": "NM",
+        "speed": "KTS"
+      },
+      "metric": {
+        "alt": "M",
+        "climb": "M/S",
+        "distance": "KM",
+        "speed": "M/S"
+      }
+    }
+  }
+}

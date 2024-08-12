@@ -7,7 +7,7 @@
     --background-colour: rgba(247, 247, 246, 0.9);
     --control-colour: rgba(189, 189, 191, 1);
     --hover-colour: rgba(0, 0, 0, 0.05);
-    --map-filters:
+    --map-filters: opacity(50%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,7 +16,7 @@
         --background-colour: rgba(34, 34, 34, 0.9);
         --control-colour: rgba(104, 106, 109, 1);
         --hover-colour: rgba(255, 255, 255, 0.05);
-        --map-filters: hue-rotate(180deg) invert(100%)
+        --map-filters: opacity(50%) hue-rotate(180deg) invert(100%);
     }
 }
 
@@ -40,7 +40,7 @@ body {
 }
 
 .leaflet-tile-pane {
-    filter: opacity(50%) var(--map-filters);
+    filter: var(--map-filters);
 }
 
 .aircraft-icon {
@@ -149,6 +149,7 @@ body {
     border-radius: 10px;
     position: absolute;
     transition: width 0.25s ease;
+    font-family: var(--default-fonts);
 }
 
 #aircraft-list-clear {
@@ -185,6 +186,7 @@ body {
     margin-top: 55px;
     overflow: scroll;
     height: calc(100vh - 65px);
+    overscroll-behavior: contain;
 }
 
 #aircraft-list > div, #aircraft-list-count {
@@ -261,14 +263,14 @@ body {
     position: absolute;
 }
 
-.aircraft-list-callsign, .aircraft-list-metrics {
+.aircraft-list-csign, .aircraft-list-metrics {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
     margin-left: 80px;
 }
 
-.aircraft-list-callsign {
+.aircraft-list-csign {
     font-weight: bold;
     font-size: 18px;
 }
@@ -296,13 +298,13 @@ body {
     display: none; /* for now until I sort out the layout */
 }
 
-#aircraft-route-origin, #aircraft-route-destination, #aircraft-airline-name {
+#aircraft-route-orig, #aircraft-route-dest, #aircraft-airline-name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#aircraft-airline-callsign {
+#aircraft-airline-csign {
     position: sticky;
     padding-bottom: 5px;
     height: 2ch;
@@ -322,19 +324,19 @@ body {
     width: calc(100% - 2.25ch)
 }
 
-#aircraft-callsign {
+#aircraft-csign {
     position: absolute;
     right: 0;
     cursor: help;
 }
 
-#aircraft-route-origin, #aircraft-route-destination {
+#aircraft-route-orig, #aircraft-route-dest {
     position: absolute;
     color: grey;
     width: calc(50% - 10px);
 }
 
-#aircraft-route-destination {
+#aircraft-route-dest {
     text-align: right;
     right: 0;
 }
@@ -374,8 +376,8 @@ body {
     height: 180px;
     object-fit: cover;
     background-color: var(--hover-colour);
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0!important;
+    margin: 0!important;
     pointer-events: none;
     z-index: -1;
     position: relative;
@@ -434,6 +436,11 @@ hr {
 
 .iata-input:focus::placeholder {
     opacity: 50%;
+}
+
+.iata-input.invalid {
+    background-color: rgba(255, 59, 48, 0.25);
+    padding: 1px 5px;
 }
 
 #iata-inputs-plane {
@@ -511,6 +518,7 @@ hr {
 
 #aircraft-reg {
     display: inline-block;
+    cursor: help;
 }
 
 a, a:hover, a:active, a:visited {
@@ -640,15 +648,15 @@ a:hover {
     margin-right: 0.25em;
 }
 
-.my-flights-airport-icon div {
+.airport-icon div {
     height: 100%;
     width: 100%;
     border-radius: 50%;
     background-color: #FF9500;
-    cursor: pointer;
+    cursor: default;
 }
 
-.my-flights-airport-icon div::after {
+.airport-icon div::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -661,7 +669,7 @@ a:hover {
     transition: width 0.1s ease, height 0.1s ease;
 }
 
-.my-flights-airport-icon div:hover::after {
+.airport-icon div:hover::after {
     height: calc(100% - 6px);
     width: calc(100% - 6px);
 }
@@ -798,9 +806,9 @@ a:hover {
         border-radius: 10px 10px 0 0;
     }
 
-    @supports(margin: max(0px) and env(safe-area-inset-left)) {
+    @supports (margin: max(0px) and (calc(env(safe-area-inset-left)))) {
         #main-container {
-            margin-left: max(10px, env(safe-area-inset-left));
+            margin-left: calc(max(10px, env(safe-area-inset-left)));
         }
     }
 
@@ -841,6 +849,7 @@ a:hover {
     .my-flights-container, .my-flights-parent {
         width: calc(100% - 20px);
     }
+
     .my-flights-title-container {
         width: calc(100% - 30px);
         margin-left: 10px;
@@ -875,7 +884,7 @@ a:hover {
     }
 
     #aircraft-list > div:hover {
-        border-radius: 0px;
+        border-radius: 0;
     }
 
     #aircraft-list > div::before {
@@ -886,7 +895,7 @@ a:hover {
         margin-left: 24px;
     }
 
-    .aircraft-list-callsign, .aircraft-list-metrics {
+    .aircraft-list-csign, .aircraft-list-metrics {
         margin-left: 95px;
     }
 
@@ -928,6 +937,7 @@ a:hover {
         backdrop-filter: blur(10px) saturate(1.8);
         -webkit-backdrop-filter: blur(10px) saturate(1.8);
     }
+
     body {
         position: fixed!important;
     }

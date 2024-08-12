@@ -1,10 +1,10 @@
 <!doctype html>
 <!-- templates/my_flights.jinja -->
 
-<html lang="en">
+<html lang="{{ strings.lang.code }}">
 <head>
-    <meta charset="UTF-8">
-    <title>My Flights</title>
+    <meta charset="UTF-8"/>
+    <title>{{ strings.ui.myflights }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="theme-color" content="#222325" media="(prefers-color-scheme: dark)"/>
@@ -14,9 +14,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}"/>
     <link rel="icon" href="{{ url_for('static', filename='icon.jpeg') }}"/>
 
+    <script>const mf = {{ my_flights | tojson }}; const strings = {{ strings | tojson }}</script>
     <script src="{{ url_for('static', filename='leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
     <script src="{{ url_for('static', filename='my_flights.js') }}"></script>
-    <script>const myFlights = {{ my_flights | tojson }}</script>
 
     <style>
         @font-face {
@@ -53,16 +54,17 @@
     <div id="my-flights-body">
         <div class="my-flights-title-container">
             <div id="pfp">{{ initial }}</div>
-            <div class="my-flights-pre-title">My Flights</div>
+            <div class="my-flights-pre-title">{{  strings.ui.myflights }}</div>
             <div class="my-flights-title">{{ name }}</div>
         </div>
         <div class="my-flights-parent">
             <div class="my-flights-container">
                 <div class="my-flights-content-box">
                     <div id="my-flights-flight-count" class="my-flights-title"></div>
-                    <div id="my-flights-international-count" class="my-flights-alt-amount"></div>
-                    <div id="my-flights-domestic-count" class="my-flights-alt-amount"></div>
-                    <div id="my-flights-intercontinental-count" class="my-flights-alt-amount"></div>
+                    <div id="my-flights-inc-count" class="my-flights-alt-amount"></div>
+                    <div id="my-flights-int-count" class="my-flights-alt-amount"></div>
+                    <div id="my-flights-dom-count" class="my-flights-alt-amount"></div>
+                    <div id="my-flights-rnl-count" class="my-flights-alt-amount"></div>
 
                     <div id="my-flights-distance-count" class="my-flights-title"></div>
                     <div id="my-flights-distance-count-earth" class="my-flights-alt-amount"></div>
@@ -205,11 +207,11 @@
             </div>
         </div>
         <footer class="credits">
-            Map displayed with <a target="_blank" href="https://leafletjs.com">Leaflet 🇺🇦</a>
+            <a target="_blank" href="https://leafletjs.com">{{ strings.acknowledgements.leaflet }}</a>
             <br>
-            <span id="my-flights-map-credit"></span>
+            <span id="map-credit"></span>
             <br><br>
-            <a target="_blank" href="about:blank">All acknowledgements &nearr;</a>
+            <a target="_blank" href="about:blank">{{ strings.acknowledgements.all }} &nearr;</a>
         </footer>
     </div>
 </body>
