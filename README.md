@@ -1,6 +1,6 @@
 # flight\_tracker
 
-Hopefully eventually an ADSB decoder and web flight tracking interface. At the moment uses [OpenSky Network](https://opensky-network.org) API states instead of decoding from a hardware reciever.
+Local web flight tracking interface that matches aircraft to locally stored datasets to provide more information than ADS-B can alone. At the moment uses [OpenSky Network](https://opensky-network.org) API states instead of decoding from a hardware reciever.
 
 ![Demo](demo/demo-light.png#gh-light-mode-only)
 ![Demo](demo/demo-dark.png#gh-dark-mode-only)
