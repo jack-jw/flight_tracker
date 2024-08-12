@@ -54,6 +54,8 @@ in the Python REPL, to see the default settings printed as a dictionary.
 ```
 The flights should now be visible through http://localhost:5003/my
 
+_You need to have travelled on at least 5 airlines and aircraft types, and to have gone to at least 5 airports for it to work at the moment._
+
 ## To-do
 * Make web interface (using opensky api demo json files for testing)
     * Map
