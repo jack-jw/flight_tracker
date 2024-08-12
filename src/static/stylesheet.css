@@ -364,6 +364,7 @@ body {
 #info {
     font-family: ui-monospace, monospace;
     right: 0;
+    display: none;
 }
 
 #back:hover, #info:hover, #back:active, #info:active {
